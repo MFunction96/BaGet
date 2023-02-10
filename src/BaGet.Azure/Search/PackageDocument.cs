@@ -1,7 +1,7 @@
 using System;
 using System.ComponentModel.DataAnnotations;
-using Microsoft.Azure.Search;
-using Microsoft.Azure.Search.Models;
+using Azure.Search;
+using Azure.Search.Documents.Models;
 
 namespace BaGet.Azure
 {
