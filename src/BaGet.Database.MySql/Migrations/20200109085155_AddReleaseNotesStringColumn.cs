@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using Microsoft.EntityFrameworkCore.Migrations;
 
 namespace BaGet.Database.MySql.Migrations
@@ -18,7 +18,7 @@ namespace BaGet.Database.MySql.Migrations
             migrationBuilder.AddColumn<string>(
                 name: "ReleaseNotes",
                 table: "Packages",
-                maxLength: 4000,
+                type: "Text",
                 nullable: true);
         }
 
