@@ -44,7 +44,7 @@ namespace BaGet.Database.MySql.Migrations
                 {
                     Key = table.Column<int>(nullable: false)
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
-                    Name = table.Column<string>(maxLength: 512, nullable: true),
+                    Name = table.Column<string>(type: "Text", nullable: true),
                     Version = table.Column<string>(maxLength: 64, nullable: true),
                     PackageKey = table.Column<int>(nullable: false)
                 },
