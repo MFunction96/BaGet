@@ -3,7 +3,8 @@
   <PropertyGroup>
     <IsPackable>false</IsPackable>
     <LangVersion>latest</LangVersion>
-    <DotNetMajorVersion>6.*</DotNetMajorVersion>
+    <DotNetMajorVersion>8.*</DotNetMajorVersion>
+    <TargetFramework>net8.0</TargetFramework>
   </PropertyGroup>
 
   <PropertyGroup>
