@@ -69,7 +69,7 @@ namespace BaGet
 
         public void Configure(ForwardedHeadersOptions options)
         {
-            options.ForwardedHeaders = ForwardedHeaders.XForwardedFor | ForwardedHeaders.XForwardedProto;
+            options.ForwardedHeaders = ForwardedHeaders.All;
 
             // Do not restrict to local network/proxy
             options.KnownNetworks.Clear();
@@ -78,7 +78,7 @@ namespace BaGet
 
         public void Configure(IISServerOptions options)
         {
-            options.MaxRequestBodySize = 262144000;
+            // options.MaxRequestBodySize = 262144000;
         }
 
         public ValidateOptionsResult Validate(string name, BaGetOptions options)
