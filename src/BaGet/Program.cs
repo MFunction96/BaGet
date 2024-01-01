@@ -74,7 +74,7 @@ namespace BaGet
                     {
                         // Remove the upload limit from Kestrel. If needed, an upload limit can
                         // be enforced by a reverse proxy server, like IIS.
-                        options.Limits.MaxRequestBodySize = null;
+                        // options.Limits.MaxRequestBodySize = null;
                     });
 
                     web.UseStartup<Startup>();
