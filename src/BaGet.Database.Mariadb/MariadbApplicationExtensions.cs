@@ -1,31 +1,31 @@
 using System;
 using BaGet.Core;
-using BaGet.Database.MySql;
+using BaGet.Database.Mariadb;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Options;
 
 namespace BaGet
 {
-    public static class MySqlApplicationExtensions
+    public static class MariadbApplicationExtensions
     {
-        public static BaGetApplication AddMySqlDatabase(this BaGetApplication app)
+        public static BaGetApplication AddMariadbDatabase(this BaGetApplication app)
         {
-            app.Services.AddBaGetDbContextProvider<MySqlContext>("MySql", (provider, options) =>
+            app.Services.AddBaGetDbContextProvider<MariadbContext>("Mariadb", (provider, options) =>
             {
                 var databaseOptions = provider.GetRequiredService<IOptionsSnapshot<DatabaseOptions>>();
 
-                options.UseMySql(databaseOptions.Value.ConnectionString, ServerVersion.Parse("10.5.15"));
+                options.UseMySql(databaseOptions.Value.ConnectionString, ServerVersion.AutoDetect(databaseOptions.Value.ConnectionString));
             });
 
             return app;
         }
 
-        public static BaGetApplication AddMySqlDatabase(
+        public static BaGetApplication AddMariadbDatabase(
             this BaGetApplication app,
             Action<DatabaseOptions> configure)
         {
-            app.AddMySqlDatabase();
+            app.AddMariadbDatabase();
             app.Services.Configure(configure);
             return app;
         }

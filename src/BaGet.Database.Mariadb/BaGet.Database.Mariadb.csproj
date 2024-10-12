@@ -2,7 +2,7 @@
 
   <PropertyGroup>
     <PackageTags>NuGet</PackageTags>
-    <Description>The libraries to host BaGet on MySQL.</Description>
+    <Description>The libraries to host BaGet on MariaDB.</Description>
   </PropertyGroup>
 
   <ItemGroup>
@@ -10,7 +10,7 @@
       <PrivateAssets>all</PrivateAssets>
       <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
     </PackageReference>
-    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="8.0.0-beta.2" />
+    <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="$(DotNetMajorVersion)" />
   </ItemGroup>
 
   <ItemGroup>

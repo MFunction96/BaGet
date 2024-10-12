@@ -62,9 +62,8 @@ namespace BaGet
         private void ConfigureBaGetApplication(BaGetApplication app)
         {
             // Add database providers.
-            app.AddMySqlDatabase();
+            app.AddMariadbDatabase();
             app.AddSqliteDatabase();
-            app.AddSqlServerDatabase();
 
             // Add storage providers.
             app.AddFileStorage();
