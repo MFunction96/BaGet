@@ -2,18 +2,14 @@ using BaGet.Core;
 using Microsoft.EntityFrameworkCore;
 using MySqlConnector;
 
-namespace BaGet.Database.MySql
+namespace BaGet.Database.Mariadb
 {
-    public class MySqlContext : AbstractContext<MySqlContext>
+    public class MariadbContext(DbContextOptions<MariadbContext> options) : AbstractContext<MariadbContext>(options)
     {
         /// <summary>
         /// The MySQL Server error code for when a unique constraint is violated.
         /// </summary>
         private const int UniqueConstraintViolationErrorCode = 1062;
-
-        public MySqlContext(DbContextOptions<MySqlContext> options) : base(options)
-        {
-        }
 
         public override bool IsUniqueConstraintViolationException(DbUpdateException exception)
         {

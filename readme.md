@@ -1,4 +1,39 @@
-# BaGet :baguette_bread:
+# BaGet
+
+> Forked from [loic-sharma/BaGet](https://github.com/loic-sharma/BaGet/)
+
+[![Build Status](https://dev.azure.com/XanaCN/Lyoko/_apis/build/status/BaGet?branchName=main)](https://dev.azure.com/XanaCN/Lyoko/_build/latest?definitionId=16&branchName=main) [![Release Status](https://vsrm.dev.azure.com/XanaCN/_apis/public/Release/badge/f06af8ee-5084-455c-ac24-8fc4f735382c/4/6)](https://dev.azure.com/XanaCN/Lyoko/_release?view=all&path=%BaGet&_a=releases) [![Code Coverage](https://img.shields.io/azure-devops/coverage/XanaCN/Lyoko/16/main)]()
+
+[![dotnet](https://img.shields.io/badge/.NET-%3E%3D8.0.4-blue.svg?style=flat-square&logo=.NET)](https://dotnet.microsoft.com/)
+[![GitHub License](https://img.shields.io/github/license/MFunction96/BaGet)](https://github.com/MFunction96/BaGet/blob/main/LICENSE)
+![GitHub Downloads (all assets, all releases)](https://img.shields.io/github/downloads/MFunction96/BaGet/total)
+
+There has been no update onto the [original BaGet repository](https://github.com/loic-sharma/BaGet/) for a long time. This fork aims to maintain the core function of NuGet Server and keep BaGet alive. So this fork will 
+ keep the minimal common components, then lightweight some features, especially custom cloud support, multiple database and storage support.
+
+**ATTENTION!!! This fork has switched to `AGPL-3.0` rather than `MIT`.**
+
+**Do SUPPORT**
+
+- Core NuGet Server function, including Upload, Store, Restore package.
+- *(In future)* User control/API Token and Package Management
+- Based on .NET 8 and above LTS
+- MariaDB and SQLite
+- FileSystem storage
+- Docker
+- *(In future)* `deb` for Linux, `msi`(or `exe`) for Windows easy-installation
+
+> Please set `Mariadb` on `Database:Type` at `appsettings.json` to use MariaDB Database. 
+
+**DO NOT SUPPORT**
+
+- Custom Cloud components, such as AWS, Azure, Aliyun, etc.
+- AzureTable, MySQL, SQL Server, PostgreSql, etc.
+- Non-FileSystem storage component, such as Azure Blob, etc.
+
+---
+
+# Original README
 
 ![Build status] [![Discord][Discord image]][Discord link] [![Twitter][Twitter image]][Twitter link]
 
