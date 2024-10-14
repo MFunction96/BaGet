@@ -10,7 +10,7 @@ namespace BaGet.Core
     /// <typeparam name="TOptions">The type of options to validate.</typeparam>
     public class ValidateBaGetOptions<TOptions> : IValidateOptions<TOptions> where TOptions : class
     {
-        private readonly string _optionsName;
+        private readonly string? _optionsName;
 
         /// <summary>
         /// Create a new validator.
@@ -19,7 +19,7 @@ namespace BaGet.Core
         /// The option's key in the configuration or appsettings.json file,
         /// or null if the options was created from the root configuration.
         /// </param>
-        public ValidateBaGetOptions(string optionsName)
+        public ValidateBaGetOptions(string? optionsName)
         {
             _optionsName = optionsName;
         }

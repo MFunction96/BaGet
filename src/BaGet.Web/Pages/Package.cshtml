@@ -211,19 +211,19 @@ else
                         Last updated @Model.LastUpdated.Humanize()
                     </li>
 
-                    @if (Model.Package.ProjectUrlString != null)
+                    @if (Model.Package.ProjectUrl != null)
                     {
                         <li>
                             <i class="ms-Icon ms-Icon--Globe"></i>
-                            <a href="@Model.Package.ProjectUrlString">Project URL</a>
+                            <a href="@Model.Package.ProjectUrl">Project URL</a>
                         </li>
                     }
 
-                    @if (Model.Package.RepositoryUrlString != null)
+                    @if (Model.Package.RepositoryUrl != null)
                     {
                         <li>
                             <img class="icon" aria-hidden="true" alt="GitHub logo" src="@Url.Content("~/_content/BaGet.Web/images/github-32x32.png")" />
-                            <a href="@Model.Package.RepositoryUrlString">Source code</a>
+                            <a href="@Model.Package.RepositoryUrl">Source code</a>
                         </li>
                     }
 

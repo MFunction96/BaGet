@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Threading;
@@ -164,10 +164,10 @@ namespace BaGet.Core.Tests
                 Assert.Equal(SemVerLevel.SemVer2, package.SemVerLevel);
                 Assert.Equal("Summary", package.Summary);
                 Assert.Equal("Title", package.Title);
-                Assert.Equal("https://icon.test/", package.IconUrlString);
-                Assert.Equal("https://license.test/", package.LicenseUrlString);
-                Assert.Equal("", package.ProjectUrlString);
-                Assert.Equal("", package.RepositoryUrlString);
+                Assert.Equal("https://icon.test/", package.IconUrl);
+                Assert.Equal("https://license.test/", package.LicenseUrl);
+                Assert.Equal("", package.ProjectUrl);
+                Assert.Equal("", package.RepositoryUrl);
                 Assert.Null(package.RepositoryType);
                 Assert.Equal(new[] { "Tag1", "Tag2" }, package.Tags);
                 Assert.Equal("1.2.3-prerelease", package.NormalizedVersionString);

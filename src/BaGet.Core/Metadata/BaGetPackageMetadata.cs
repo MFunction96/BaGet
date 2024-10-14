@@ -17,7 +17,7 @@ namespace BaGet.Core
         public bool HasReadme { get; set; }
 
         [JsonPropertyName("packageTypes")]
-        public IReadOnlyList<string> PackageTypes { get; set; }
+        public IReadOnlyList<string>? PackageTypes { get; set; }
 
         /// <summary>
         /// The package's release notes.

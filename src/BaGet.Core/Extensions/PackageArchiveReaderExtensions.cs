@@ -65,10 +65,10 @@ namespace BaGet.Core
                 SemVerLevel = GetSemVerLevel(nuspec),
                 Summary = nuspec.GetSummary(),
                 Title = nuspec.GetTitle(),
-                IconUrl = ParseUri(nuspec.GetIconUrl()),
-                LicenseUrl = ParseUri(nuspec.GetLicenseUrl()),
-                ProjectUrl = ParseUri(nuspec.GetProjectUrl()),
-                RepositoryUrl = repositoryUri,
+                IconUrl = nuspec.GetIconUrl(),
+                LicenseUrl = nuspec.GetLicenseUrl(),
+                ProjectUrl = nuspec.GetProjectUrl(),
+                RepositoryUrl = repositoryUri.AbsoluteUri,
                 RepositoryType = repositoryType,
                 Dependencies = GetDependencies(nuspec),
                 Tags = ParseTags(nuspec.GetTags()),
@@ -100,7 +100,7 @@ namespace BaGet.Core
             return SemVerLevel.Unknown;
         }
 
-        private static Uri ParseUri(string uriString)
+        private static Uri? ParseUri(string uriString)
         {
             if (string.IsNullOrEmpty(uriString)) return null;
 

@@ -1,4 +1,4 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using BaGet.Protocol.Models;
@@ -24,20 +24,20 @@ namespace BaGet.Core
                 var latest = versions.First();
                 var iconUrl = latest.HasEmbeddedIcon
                     ? _url.GetPackageIconDownloadUrl(latest.Id, latest.Version)
-                    : latest.IconUrlString;
+                    : latest.IconUrl;
 
                 result.Add(new SearchResult
                 {
                     PackageId = latest.Id,
                     Version = latest.Version.ToFullString(),
                     Description = latest.Description,
-                    Authors = latest.Authors,
+                    Authors = latest.Authors.ToList(),
                     IconUrl = iconUrl,
-                    LicenseUrl = latest.LicenseUrlString,
-                    ProjectUrl = latest.ProjectUrlString,
+                    LicenseUrl = latest.LicenseUrl ?? string.Empty,
+                    ProjectUrl = latest.ProjectUrl ?? string.Empty,
                     RegistrationIndexUrl = _url.GetRegistrationIndexUrl(latest.Id),
                     Summary = latest.Summary,
-                    Tags = latest.Tags,
+                    Tags = latest.Tags?.ToList() ?? new List<string>(),
                     Title = latest.Title,
                     TotalDownloads = versions.Sum(p => p.Downloads),
                     Versions = versions

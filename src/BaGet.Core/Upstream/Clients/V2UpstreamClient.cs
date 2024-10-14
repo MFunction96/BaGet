@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NuGet.Common;
@@ -12,6 +6,12 @@ using NuGet.Packaging;
 using NuGet.Protocol;
 using NuGet.Protocol.Core.Types;
 using NuGet.Versioning;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BaGet.Core
 {
@@ -145,9 +145,9 @@ namespace BaGet.Core
                 RequireLicenseAcceptance = package.RequireLicenseAcceptance,
                 Summary = package.Summary,
                 Title = package.Title,
-                IconUrl = package.IconUrl,
-                LicenseUrl = package.LicenseUrl,
-                ProjectUrl = package.ProjectUrl,
+                IconUrl = package.IconUrl.AbsoluteUri,
+                LicenseUrl = package.LicenseUrl.AbsoluteUri,
+                ProjectUrl = package.ProjectUrl.AbsoluteUri,
                 PackageTypes = new List<PackageType>(),
                 RepositoryUrl = null,
                 RepositoryType = null,

@@ -104,9 +104,9 @@ namespace BaGet.Core
                 RequireLicenseAcceptance = metadata.RequireLicenseAcceptance,
                 Summary = metadata.Summary,
                 Title = metadata.Title,
-                IconUrl = ParseUri(metadata.IconUrl),
-                LicenseUrl = ParseUri(metadata.LicenseUrl),
-                ProjectUrl = ParseUri(metadata.ProjectUrl),
+                IconUrl = metadata.IconUrl,
+                LicenseUrl = metadata.LicenseUrl,
+                ProjectUrl = metadata.ProjectUrl,
                 PackageTypes = new List<PackageType>(),
                 RepositoryUrl = null,
                 RepositoryType = null,
@@ -115,18 +115,6 @@ namespace BaGet.Core
 
                 Dependencies = ToDependencies(metadata)
             };
-        }
-
-        private Uri ParseUri(string uriString)
-        {
-            if (uriString == null) return null;
-
-            if (!Uri.TryCreate(uriString, UriKind.Absolute, out var uri))
-            {
-                return null;
-            }
-
-            return uri;
         }
 
         private string[] ParseAuthors(string authors)

@@ -7,7 +7,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace BaGet.Database.Mariadb.Migrations
 {
     /// <inheritdoc />
-    public partial class MigrateMariadb : Migration
+    public partial class MigrationToMariaDB : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -23,41 +23,41 @@ namespace BaGet.Database.Mariadb.Migrations
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Id = table.Column<string>(type: "varchar(128)", maxLength: 128, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Authors = table.Column<string>(type: "varchar(4000)", maxLength: 4000, nullable: true)
+                    Authors = table.Column<string>(type: "longtext", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Description = table.Column<string>(type: "varchar(4000)", maxLength: 4000, nullable: true)
+                    Description = table.Column<string>(type: "text", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Downloads = table.Column<long>(type: "bigint", nullable: false),
                     HasReadme = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     HasEmbeddedIcon = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     IsPrerelease = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    ReleaseNotes = table.Column<string>(type: "longtext", nullable: true)
+                    ReleaseNotes = table.Column<string>(type: "text", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Language = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: true)
+                    Language = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Listed = table.Column<bool>(type: "tinyint(1)", nullable: false),
-                    MinClientVersion = table.Column<string>(type: "varchar(44)", maxLength: 44, nullable: true)
+                    MinClientVersion = table.Column<string>(type: "varchar(44)", maxLength: 44, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Published = table.Column<DateTime>(type: "datetime(6)", nullable: false),
                     RequireLicenseAcceptance = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     SemVerLevel = table.Column<int>(type: "int", nullable: false),
-                    Summary = table.Column<string>(type: "varchar(4000)", maxLength: 4000, nullable: true)
+                    Summary = table.Column<string>(type: "text", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Title = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true)
+                    Title = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    IconUrl = table.Column<string>(type: "varchar(4000)", maxLength: 4000, nullable: true)
+                    IconUrl = table.Column<string>(type: "text", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    LicenseUrl = table.Column<string>(type: "varchar(4000)", maxLength: 4000, nullable: true)
+                    LicenseUrl = table.Column<string>(type: "text", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    ProjectUrl = table.Column<string>(type: "varchar(4000)", maxLength: 4000, nullable: true)
+                    ProjectUrl = table.Column<string>(type: "text", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    RepositoryUrl = table.Column<string>(type: "varchar(4000)", maxLength: 4000, nullable: true)
+                    RepositoryUrl = table.Column<string>(type: "text", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    RepositoryType = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true)
+                    RepositoryType = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Tags = table.Column<string>(type: "varchar(4000)", maxLength: 4000, nullable: true)
+                    Tags = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    RowVersion = table.Column<DateTime>(type: "timestamp(6)", rowVersion: true, nullable: true),
+                    RowVersion = table.Column<DateTime>(type: "timestamp(6)", rowVersion: true, nullable: false),
                     Version = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     OriginalVersion = table.Column<string>(type: "varchar(64)", maxLength: 64, nullable: true)

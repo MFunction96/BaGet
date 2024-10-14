@@ -41,7 +41,7 @@ namespace BaGet.Core
         /// <returns>The dependency injection container.</returns>
         public static IServiceCollection AddBaGetOptions<TOptions>(
             this IServiceCollection services,
-            string key = null)
+            string? key = null)
             where TOptions : class
         {
             services.AddSingleton<IValidateOptions<TOptions>>(new ValidateBaGetOptions<TOptions>(key));
@@ -171,7 +171,7 @@ namespace BaGet.Core
             var options = provider.GetRequiredService<IOptions<MirrorOptions>>().Value;
 
             var assembly = Assembly.GetEntryAssembly();
-            var assemblyName = assembly.GetName().Name;
+            var assemblyName = assembly!.GetName().Name;
             var assemblyVersion = assembly.GetCustomAttribute<AssemblyInformationalVersionAttribute>()?.InformationalVersion ?? "0.0.0";
 
             var client = new HttpClient(new HttpClientHandler
