@@ -18,7 +18,7 @@ using Xunit.Abstractions;
 
 namespace BaGet.Tests
 {
-    public class BaGetApplication : WebApplicationFactory<Startup>
+    public class BaGetApplication : WebApplicationFactory<Program>
     {
         private readonly ITestOutputHelper _output;
         private readonly HttpClient _upstreamClient;
@@ -42,7 +42,7 @@ namespace BaGet.Tests
             Directory.CreateDirectory(tempPath);
 
             builder
-                .UseStartup<Startup>()
+                .UseStartup<Program>()
                 .UseEnvironment("Production")
                 .ConfigureLogging(logging =>
                 {
@@ -105,7 +105,7 @@ namespace BaGet.Tests
     internal static class BaGetWebApplicationFactoryExtensions
     {
         public static async Task AddPackageAsync(
-            this WebApplicationFactory<Startup> factory,
+            this WebApplicationFactory<Program> factory,
             Stream package,
             CancellationToken cancellationToken = default)
         {
@@ -122,7 +122,7 @@ namespace BaGet.Tests
         }
 
         public static async Task AddSymbolPackageAsync(
-            this WebApplicationFactory<Startup> factory,
+            this WebApplicationFactory<Program> factory,
             Stream symbolPackage,
             CancellationToken cancellationToken = default)
         {

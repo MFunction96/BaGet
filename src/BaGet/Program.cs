@@ -1,84 +1,68 @@
-using System;
-using System.Threading.Tasks;
+using BaGet;
 using BaGet.Core;
-using BaGet.Web;
-using McMaster.Extensions.CommandLineUtils;
-using Microsoft.AspNetCore.Hosting;
+using BaGet.Extensions;
+using Microsoft.AspNetCore.Builder;
+using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 
-namespace BaGet
+var builder = WebApplication.CreateBuilder(args);
+builder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
-    public class Program
-    {
-        public static async Task Main(string[] args)
-        {
-            var host = CreateHostBuilder(args).Build();
-            if (!host.ValidateStartupOptions())
-            {
-                return;
-            }
+    options.ForwardedHeaders = ForwardedHeaders.All;
+});
+builder.Services.AddBaGetWebApplication(app =>
+{
+    // Add database providers.
+    app.AddMariadbDatabase();
+    app.AddSqliteDatabase();
 
-            var app = new CommandLineApplication
-            {
-                Name = "baget",
-                Description = "A light-weight NuGet service",
-            };
+    // Add storage providers.
+    app.AddFileStorage();
 
-            app.HelpOption(inherited: true);
+    // Add search providers.
+});
 
-            app.Command("import", import =>
-            {
-                import.Command("downloads", downloads =>
-                {
-                    downloads.OnExecuteAsync(async cancellationToken =>
-                    {
-                        using (var scope = host.Services.CreateScope())
-                        {
-                            var importer = scope.ServiceProvider.GetRequiredService<DownloadsImporter>();
+// You can swap between implementations of subsystems like storage and search using BaGet's configuration.
+// Each subsystem's implementation has a provider that reads the configuration to determine if it should be
+// activated. BaGet will run through all its providers until it finds one that is active.
+builder.Services.AddScoped(DependencyInjectionExtensions.GetServiceFromProviders<IContext>);
+builder.Services.AddTransient(DependencyInjectionExtensions.GetServiceFromProviders<IStorageService>);
+builder.Services.AddTransient(DependencyInjectionExtensions.GetServiceFromProviders<IPackageDatabase>);
+builder.Services.AddTransient(DependencyInjectionExtensions.GetServiceFromProviders<ISearchService>);
+builder.Services.AddTransient(DependencyInjectionExtensions.GetServiceFromProviders<ISearchIndexer>);
+builder.Services.AddRazorPages();
+builder.Services.AddCors();
 
-                            await importer.ImportAsync(cancellationToken);
-                        }
-                    });
-                });
-            });
+var app = builder.Build();
+var options = app.Configuration.Get<BaGetOptions>()!;
 
-            app.Option("--urls", "The URLs that BaGet should bind to.", CommandOptionType.SingleValue);
-
-            app.OnExecuteAsync(async cancellationToken =>
-            {
-                await host.RunMigrationsAsync(cancellationToken);
-                await host.RunAsync(cancellationToken);
-            });
-
-            await app.ExecuteAsync(args);
-        }
-
-        public static IHostBuilder CreateHostBuilder(string[] args)
-        {
-            return Host
-                .CreateDefaultBuilder(args)
-                .ConfigureAppConfiguration((ctx, config) =>
-                {
-                    var root = Environment.GetEnvironmentVariable("BAGET_CONFIG_ROOT");
-
-                    if (!string.IsNullOrEmpty(root))
-                    {
-                        config.SetBasePath(root);
-                    }
-                })
-                .ConfigureWebHostDefaults(web =>
-                {
-                    web.ConfigureKestrel(options =>
-                    {
-                        // Remove the upload limit from Kestrel. If needed, an upload limit can
-                        // be enforced by a reverse proxy server, like IIS.
-                        // options.Limits.MaxRequestBodySize = null;
-                    });
-
-                    web.UseStartup<Startup>();
-                });
-        }
-    }
+if (app.Environment.IsDevelopment())
+{
+    app.UseDeveloperExceptionPage();
+    app.UseStatusCodePages();
 }
+else
+{
+    app.UseExceptionHandler("/Error");
+    // The default HSTS value is 30 days. You may want to change this for production scenarios, see https://aka.ms/aspnetcore-hsts.
+    app.UseHsts();
+}
+
+app.UseForwardedHeaders();
+app.UsePathBase(options.PathBase);
+
+app.UseStaticFiles();
+app.UseRouting();
+
+app.UseOperationCancelledMiddleware();
+
+app.UseEndpoints(endpoints =>
+{
+    var baget = new BaGetEndpointBuilder();
+
+    baget.MapEndpoints(endpoints);
+});
+
+public partial class Program { }

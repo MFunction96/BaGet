@@ -1,4 +1,3 @@
-using System;
 using BaGet.Core;
 using BaGet.Database.Mariadb;
 using Microsoft.EntityFrameworkCore;
@@ -18,15 +17,6 @@ namespace BaGet
                 options.UseMySql(databaseOptions.Value.ConnectionString, ServerVersion.AutoDetect(databaseOptions.Value.ConnectionString));
             });
 
-            return app;
-        }
-
-        public static BaGetApplication AddMariadbDatabase(
-            this BaGetApplication app,
-            Action<DatabaseOptions> configure)
-        {
-            app.AddMariadbDatabase();
-            app.Services.Configure(configure);
             return app;
         }
     }
