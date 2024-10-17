@@ -1,10 +1,11 @@
 using BaGet.Core;
+using BaGet.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 using MySqlConnector;
 
 namespace BaGet.Database.Mariadb
 {
-    public class MariadbContext(DbContextOptions<MariadbContext> options) : AbstractContext<MariadbContext>(options)
+    public class MariadbContext(DbContextOptions<BaGetDbContext> options) : BaGetDbContext(options)
     {
         /// <summary>
         /// The MySQL Server error code for when a unique constraint is violated.

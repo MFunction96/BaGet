@@ -2,6 +2,7 @@ using System;
 using System.Threading;
 using System.Threading.Tasks;
 using BaGet.Core;
+using BaGet.Core.Configuration;
 using BaGet.Extensions;
 using BaGet.Web;
 using Microsoft.AspNetCore.Mvc;
@@ -15,14 +16,14 @@ namespace BaGet.Controllers
         private readonly IAuthenticationService _authentication;
         private readonly ISymbolIndexingService _indexer;
         private readonly ISymbolStorageService _storage;
-        private readonly IOptionsSnapshot<BaGetOptions> _options;
+        private readonly IOptions<BaGetOptions> _options;
         private readonly ILogger<SymbolController> _logger;
 
         public SymbolController(
             IAuthenticationService authentication,
             ISymbolIndexingService indexer,
             ISymbolStorageService storage,
-            IOptionsSnapshot<BaGetOptions> options,
+            IOptions<BaGetOptions> options,
             ILogger<SymbolController> logger)
         {
             _authentication = authentication ?? throw new ArgumentNullException(nameof(authentication));

@@ -1,17 +1,18 @@
 using BaGet.Core;
+using BaGet.Core.Entities;
 using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 
 namespace BaGet.Database.Sqlite
 {
-    public class SqliteContext : AbstractContext<SqliteContext>
+    public class SqliteContext : BaGetDbContext
     {
         /// <summary>
         /// The Sqlite error code for when a unique constraint is violated.
         /// </summary>
         private const int SqliteUniqueConstraintViolationErrorCode = 19;
 
-        public SqliteContext(DbContextOptions<SqliteContext> options)
+        public SqliteContext(DbContextOptions<BaGetDbContext> options)
             : base(options)
         { }
 

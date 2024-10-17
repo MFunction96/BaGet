@@ -1,12 +1,13 @@
-using Microsoft.EntityFrameworkCore;
-using NuGet.Versioning;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using Microsoft.EntityFrameworkCore;
+using NuGet.Versioning;
+
 // ReSharper disable EntityFramework.ModelValidation.UnlimitedStringLength
 
-namespace BaGet.Core
+namespace BaGet.Core.Entities
 {
     // See NuGetGallery's: https://github.com/NuGet/NuGetGallery/blob/master/src/NuGetGallery.Core/Entities/Package.cs
     [Index(nameof(Id))]
@@ -17,7 +18,7 @@ namespace BaGet.Core
 
         [Required]
         [Unicode]
-        [MaxLength(AbstractContext<DbContext>.MaxPackageIdLength)]
+        [MaxLength(BaGetDbContext.MaxPackageIdLength)]
         public string Id { get; set; } = string.Empty;
 
         [NotMapped]
@@ -51,11 +52,11 @@ namespace BaGet.Core
         [Column(TypeName = "text")]
         public string? ReleaseNotes { get; set; }
         [Unicode]
-        [MaxLength(AbstractContext<DbContext>.MaxPackageLanguageLength)]
+        [MaxLength(BaGetDbContext.MaxPackageLanguageLength)]
         public string Language { get; set; } = string.Empty;
         public bool Listed { get; set; }
         [Unicode]
-        [MaxLength(AbstractContext<DbContext>.MaxPackageMinClientVersionLength)]
+        [MaxLength(BaGetDbContext.MaxPackageMinClientVersionLength)]
         public string MinClientVersion { get; set; } = string.Empty;
         public DateTime Published { get; set; }
         public bool RequireLicenseAcceptance { get; set; }
@@ -64,7 +65,7 @@ namespace BaGet.Core
         [Column(TypeName = "text")]
         public string Summary { get; set; } = string.Empty;
         [Unicode]
-        [MaxLength(AbstractContext<DbContext>.MaxPackageTitleLength)]
+        [MaxLength(BaGetDbContext.MaxPackageTitleLength)]
         public string Title { get; set; } = string.Empty;
 
         [Unicode]
@@ -80,7 +81,7 @@ namespace BaGet.Core
         [Column(TypeName = "text")]
         public string? RepositoryUrl { get; set; }
         [Unicode]
-        [MaxLength(AbstractContext<DbContext>.MaxRepositoryTypeLength)]
+        [MaxLength(BaGetDbContext.MaxRepositoryTypeLength)]
         public string RepositoryType { get; set; } = string.Empty;
 
         [Unicode]
@@ -95,12 +96,12 @@ namespace BaGet.Core
         [Column("Version")]
         [Unicode]
         [Required]
-        [MaxLength(AbstractContext<DbContext>.MaxPackageVersionLength)]
+        [MaxLength(BaGetDbContext.MaxPackageVersionLength)]
         public string NormalizedVersionString { get; set; } = string.Empty;
 
         [Column("OriginalVersion")]
         [Unicode]
-        [MaxLength(AbstractContext<DbContext>.MaxPackageVersionLength)]
+        [MaxLength(BaGetDbContext.MaxPackageVersionLength)]
         public string? OriginalVersionString { get; set; }
 
         public ICollection<PackageDependency> Dependencies { get; set; } = new List<PackageDependency>();

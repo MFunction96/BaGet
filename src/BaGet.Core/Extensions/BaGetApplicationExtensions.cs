@@ -21,18 +21,5 @@ namespace BaGet
             app.Services.Configure(configure);
             return app;
         }
-
-        public static BaGetApplication AddNullStorage(this BaGetApplication app)
-        {
-            app.Services.TryAddTransient<IStorageService>(provider => provider.GetRequiredService<NullStorageService>());
-            return app;
-        }
-
-        public static BaGetApplication AddNullSearch(this BaGetApplication app)
-        {
-            app.Services.TryAddTransient<ISearchIndexer>(provider => provider.GetRequiredService<NullSearchIndexer>());
-            app.Services.TryAddTransient<ISearchService>(provider => provider.GetRequiredService<NullSearchService>());
-            return app;
-        }
     }
 }

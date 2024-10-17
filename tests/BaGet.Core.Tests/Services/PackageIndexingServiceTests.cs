@@ -1,4 +1,5 @@
 using System.Threading.Tasks;
+using BaGet.Core.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -26,7 +27,7 @@ namespace BaGet.Core.Tests.Services
                 _storage.Object,
                 _search.Object,
                 _time.Object,
-                Mock.Of<IOptionsSnapshot<BaGetOptions>>(),
+                Mock.Of<IOptions<BaGetOptions>>(),
                 Mock.Of<ILogger<PackageIndexingService>>());
         }
 

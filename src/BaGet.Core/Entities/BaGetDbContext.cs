@@ -1,11 +1,10 @@
-using Microsoft.EntityFrameworkCore;
 using System.Threading;
 using System.Threading.Tasks;
+using Microsoft.EntityFrameworkCore;
 
-namespace BaGet.Core
+namespace BaGet.Core.Entities
 {
-    public abstract class AbstractContext<TContext>(DbContextOptions<TContext> options) : DbContext(options), IContext
-        where TContext : DbContext
+    public abstract class BaGetDbContext(DbContextOptions<BaGetDbContext> options) : DbContext(options)
     {
         public const int MaxPackageIdLength = 128;
         public const int MaxPackageVersionLength = 64;

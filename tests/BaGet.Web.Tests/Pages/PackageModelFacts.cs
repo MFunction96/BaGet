@@ -5,6 +5,7 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using BaGet.Core;
+using BaGet.Core.Entities;
 using BaGet.Pages;
 using Moq;
 using NuGet.Versioning;

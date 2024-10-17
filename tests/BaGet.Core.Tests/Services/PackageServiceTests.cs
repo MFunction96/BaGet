@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using BaGet.Core.Entities;
 using Microsoft.Extensions.Logging;
 using Moq;
 using NuGet.Versioning;

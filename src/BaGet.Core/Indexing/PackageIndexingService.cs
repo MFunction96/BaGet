@@ -2,6 +2,8 @@ using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
+using BaGet.Core.Configuration;
+using BaGet.Core.Entities;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NuGet.Packaging;
@@ -14,7 +16,7 @@ namespace BaGet.Core
         private readonly IPackageStorageService _storage;
         private readonly ISearchIndexer _search;
         private readonly SystemTime _time;
-        private readonly IOptionsSnapshot<BaGetOptions> _options;
+        private readonly IOptions<BaGetOptions> _options;
         private readonly ILogger<PackageIndexingService> _logger;
 
         public PackageIndexingService(
@@ -22,7 +24,7 @@ namespace BaGet.Core
             IPackageStorageService storage,
             ISearchIndexer search,
             SystemTime time,
-            IOptionsSnapshot<BaGetOptions> options,
+            IOptions<BaGetOptions> options,
             ILogger<PackageIndexingService> logger)
         {
             _packages = packages ?? throw new ArgumentNullException(nameof(packages));

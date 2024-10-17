@@ -5,6 +5,7 @@ using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
 using BaGet.Core;
+using BaGet.Core.Entities;
 using Microsoft.AspNetCore.Hosting;
 using Microsoft.AspNetCore.Mvc.Testing;
 using Microsoft.EntityFrameworkCore;
@@ -93,7 +94,7 @@ namespace BaGet.Tests
                     // pauses the debugger repeatedly if CLR exceptions are enabled.
                     // See: https://github.com/dotnet/efcore/blob/644d3c8c3a604fd0121d90eaf34f14870e19bcff/src/EFCore.Sqlite.Core/Storage/Internal/SqliteDatabaseCreator.cs#L88-L98
                     using var scope = scopeFactory.CreateScope();
-                    var ctx = scope.ServiceProvider.GetRequiredService<IContext>();
+                    var ctx = scope.ServiceProvider.GetRequiredService<BaGetDbContext>();
                     var dbCreator = ctx.Database.GetService<IRelationalDatabaseCreator>();
 
                     dbCreator.Create();

@@ -1,5 +1,6 @@
 using System.Threading;
 using System.Threading.Tasks;
+using BaGet.Core.Configuration;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using Moq;
@@ -25,7 +26,7 @@ namespace BaGet.Core.Tests.Services
             _storage = new Mock<IPackageStorageService>();
             _options = new BaGetOptions();
 
-            var optionsSnapshot = new Mock<IOptionsSnapshot<BaGetOptions>>();
+            var optionsSnapshot = new Mock<IOptions<BaGetOptions>>();
             optionsSnapshot.Setup(o => o.Value).Returns(_options);
 
             _target = new PackageDeletionService(

@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using BaGet.Core.Entities;
 
 namespace BaGet.Core
 {
@@ -9,7 +10,7 @@ namespace BaGet.Core
         [Key]
         public int Key { get; set; }
         [Unicode]
-        [MaxLength(AbstractContext<DbContext>.MaxTargetFrameworkLength)]
+        [MaxLength(BaGetDbContext.MaxTargetFrameworkLength)]
         public string? Moniker { get; set; }
 
         public Package Package { get; set; } = null!;

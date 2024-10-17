@@ -1,34 +1,25 @@
+using BaGet.Core.Entities;
+using BaGet.Protocol.Models;
+using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using BaGet.Protocol.Models;
-using Microsoft.EntityFrameworkCore;
 
-namespace BaGet.Core
+namespace BaGet.Core.Search
 {
-    public class DatabaseSearchService : ISearchService
+    public class DatabaseSearchService(
+        BaGetDbContext context,
+        IFrameworkCompatibilityService frameworks,
+        ISearchResponseBuilder searchBuilder)
+        : ISearchService
     {
-        private readonly IContext _context;
-        private readonly IFrameworkCompatibilityService _frameworks;
-        private readonly ISearchResponseBuilder _searchBuilder;
-
-        public DatabaseSearchService(
-            IContext context,
-            IFrameworkCompatibilityService frameworks,
-            ISearchResponseBuilder searchBuilder)
-        {
-            _context = context ?? throw new ArgumentNullException(nameof(context));
-            _frameworks = frameworks ?? throw new ArgumentNullException(nameof(frameworks));
-            _searchBuilder = searchBuilder ?? throw new ArgumentNullException(nameof(searchBuilder));
-        }
-
         public async Task<SearchResponse> SearchAsync(SearchRequest request,  CancellationToken cancellationToken)
         {
             var frameworks = GetCompatibleFrameworksOrNull(request.Framework);
 
-            IQueryable<Package> search = _context.Packages;
+            IQueryable<Package> search = context.Packages;
             search = ApplySearchQuery(search, request.Query);
             search = ApplySearchFilters(
                 search,
@@ -50,15 +41,15 @@ namespace BaGet.Core
             // the package IDs in a subquery. Otherwise, run two queries:
             //   1. Find the package IDs that match the search
             //   2. Find all package versions for these package IDs
-            if (_context.SupportsLimitInSubqueries)
+            if (context.SupportsLimitInSubqueries)
             {
-                search = _context.Packages.Where(p => packageIds.Contains(p.Id));
+                search = context.Packages.Where(p => packageIds.Contains(p.Id));
             }
             else
             {
                 var packageIdResults = await packageIds.ToListAsync(cancellationToken);
 
-                search = _context.Packages.Where(p => packageIdResults.Contains(p.Id));
+                search = context.Packages.Where(p => packageIdResults.Contains(p.Id));
             }
 
             search = ApplySearchFilters(
@@ -74,14 +65,14 @@ namespace BaGet.Core
                 .Select(group => new PackageRegistration(group.Key, group.ToList()))
                 .ToList();
 
-            return _searchBuilder.BuildSearch(groupedResults);
+            return searchBuilder.BuildSearch(groupedResults);
         }
 
         public async Task<AutocompleteResponse> AutocompleteAsync(
             AutocompleteRequest request,
             CancellationToken cancellationToken)
         {
-            IQueryable<Package> search = _context.Packages;
+            IQueryable<Package> search = context.Packages;
 
             search = ApplySearchQuery(search, request.Query);
             search = ApplySearchFilters(
@@ -99,7 +90,7 @@ namespace BaGet.Core
                 .Take(request.Take)
                 .ToListAsync(cancellationToken);
 
-            return _searchBuilder.BuildAutocomplete(packageIds);
+            return searchBuilder.BuildAutocomplete(packageIds);
         }
 
         public async Task<AutocompleteResponse> ListPackageVersionsAsync(
@@ -107,7 +98,7 @@ namespace BaGet.Core
             CancellationToken cancellationToken)
         {
             var packageId = request.PackageId.ToLower();
-            var search = _context
+            var search = context
                 .Packages
                 .Where(p => p.Id.ToLower().Equals(packageId));
 
@@ -122,12 +113,12 @@ namespace BaGet.Core
                 .Select(p => p.NormalizedVersionString)
                 .ToListAsync(cancellationToken);
 
-            return _searchBuilder.BuildAutocomplete(packageVersions);
+            return searchBuilder.BuildAutocomplete(packageVersions);
         }
 
         public async Task<DependentsResponse> FindDependentsAsync(string packageId, CancellationToken cancellationToken)
         {
-            var dependents = await _context
+            var dependents = await context
                 .Packages
                 .Where(p => p.Listed)
                 .OrderByDescending(p => p.Downloads)
@@ -142,7 +133,7 @@ namespace BaGet.Core
                 .Distinct()
                 .ToListAsync(cancellationToken);
 
-            return _searchBuilder.BuildDependents(dependents);
+            return searchBuilder.BuildDependents(dependents);
         }
 
         private IQueryable<Package> ApplySearchQuery(IQueryable<Package> query, string search)
@@ -191,7 +182,7 @@ namespace BaGet.Core
         {
             if (framework == null) return null;
 
-            return _frameworks.FindAllCompatibleFrameworks(framework);
+            return frameworks.FindAllCompatibleFrameworks(framework);
         }
     }
 }

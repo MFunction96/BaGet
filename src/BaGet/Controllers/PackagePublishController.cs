@@ -7,6 +7,7 @@ using NuGet.Versioning;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using BaGet.Core.Configuration;
 using BaGet.Extensions;
 
 namespace BaGet.Controllers
@@ -17,7 +18,7 @@ namespace BaGet.Controllers
         private readonly IPackageIndexingService _indexer;
         private readonly IPackageDatabase _packages;
         private readonly IPackageDeletionService _deleteService;
-        private readonly IOptionsSnapshot<BaGetOptions> _options;
+        private readonly IOptions<BaGetOptions> _options;
         private readonly ILogger<PackagePublishController> _logger;
 
         public PackagePublishController(
@@ -25,7 +26,7 @@ namespace BaGet.Controllers
             IPackageIndexingService indexer,
             IPackageDatabase packages,
             IPackageDeletionService deletionService,
-            IOptionsSnapshot<BaGetOptions> options,
+            IOptions<BaGetOptions> options,
             ILogger<PackagePublishController> logger)
         {
             _authentication = authentication ?? throw new ArgumentNullException(nameof(authentication));

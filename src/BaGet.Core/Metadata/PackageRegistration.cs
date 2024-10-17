@@ -1,5 +1,6 @@
 using System;
 using System.Collections.Generic;
+using BaGet.Core.Entities;
 
 namespace BaGet.Core
 {

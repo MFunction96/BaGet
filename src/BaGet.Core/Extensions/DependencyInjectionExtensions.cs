@@ -2,6 +2,11 @@ using System;
 using System.Net;
 using System.Net.Http;
 using System.Reflection;
+using BaGet.Core.Authentication;
+using BaGet.Core.Configuration;
+using BaGet.Core.Extensions;
+using BaGet.Core.Search;
+using BaGet.Core.Upstream;
 using BaGet.Protocol;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
@@ -18,13 +23,11 @@ namespace BaGet.Core
         {
             var app = new BaGetApplication(services);
 
-            services.AddConfiguration();
+            //services.AddConfiguration();
             services.AddBaGetServices();
             services.AddDefaultProviders();
 
             configureAction(app);
-
-            services.AddFallbackServices();
 
             return services;
         }
@@ -76,8 +79,6 @@ namespace BaGet.Core
 
             services.TryAddSingleton<ISearchResponseBuilder, SearchResponseBuilder>();
             services.TryAddSingleton<NuGetClient>();
-            services.TryAddSingleton<NullSearchIndexer>();
-            services.TryAddSingleton<NullSearchService>();
             services.TryAddSingleton<RegistrationBuilder>();
             services.TryAddSingleton<SystemTime>();
             services.TryAddSingleton<ValidateStartupOptions>();
@@ -104,7 +105,6 @@ namespace BaGet.Core
             services.TryAddTransient<V2UpstreamClient>();
             services.TryAddTransient<V3UpstreamClient>();
             services.TryAddTransient<DisabledUpstreamClient>();
-            services.TryAddSingleton<NullStorageService>();
             services.TryAddTransient<PackageDatabase>();
 
             services.TryAddTransient(UpstreamClientFactory);
@@ -112,20 +112,6 @@ namespace BaGet.Core
 
         private static void AddDefaultProviders(this IServiceCollection services)
         {
-            services.AddProvider((provider, configuration) =>
-            {
-                if (!configuration.HasSearchType("null")) return null;
-
-                return provider.GetRequiredService<NullSearchService>();
-            });
-
-            services.AddProvider((provider, configuration) =>
-            {
-                if (!configuration.HasSearchType("null")) return null;
-
-                return provider.GetRequiredService<NullSearchIndexer>();
-            });
-
             services.AddProvider<IStorageService>((provider, configuration) =>
             {
                 if (configuration.HasStorageType("filesystem"))
@@ -133,37 +119,8 @@ namespace BaGet.Core
                     return provider.GetRequiredService<FileStorageService>();
                 }
 
-                if (configuration.HasStorageType("null"))
-                {
-                    return provider.GetRequiredService<NullStorageService>();
-                }
-
                 return null;
             });
-        }
-
-        private static void AddFallbackServices(this IServiceCollection services)
-        {
-            services.TryAddScoped<IContext, NullContext>();
-
-            // BaGet's services have multiple implementations that live side-by-side.
-            // The application will choose the implementation using one of two ways:
-            //
-            // 1. Using the first implementation that was registered in the dependency injection
-            //    container. This is the strategy used by applications that embed BaGet.
-            // 2. Using "providers". The providers will examine the application's configuration to
-            //    determine whether its service implementation is active. Thsi is the strategy used
-            //    by the default BaGet application.
-            //
-            // BaGet has database and search services, but the database services are special
-            // in that they may also act as search services. If an application registers the
-            // database service first and the search service second, the application should
-            // use the search service even though it wasn't registered first. Furthermore,
-            // if an application registers a database service without a search service, the
-            // database service should be used for search. This effect is achieved by deferring
-            // the database search service's registration until the very end.
-            services.TryAddTransient<ISearchIndexer>(provider => provider.GetRequiredService<NullSearchIndexer>());
-            services.TryAddTransient<ISearchService>(provider => provider.GetRequiredService<DatabaseSearchService>());
         }
 
         private static HttpClient HttpClientFactory(IServiceProvider provider)
@@ -197,7 +154,7 @@ namespace BaGet.Core
 
         private static IUpstreamClient UpstreamClientFactory(IServiceProvider provider)
         {
-            var options = provider.GetRequiredService<IOptionsSnapshot<MirrorOptions>>();
+            var options = provider.GetRequiredService<IOptions<MirrorOptions>>();
 
             // TODO: Convert to switch expression.
             if (!options.Value.Enabled)

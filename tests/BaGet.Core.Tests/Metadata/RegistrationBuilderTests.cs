@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Linq;
+using BaGet.Core.Entities;
 using Moq;
 using NuGet.Versioning;
 using Xunit;

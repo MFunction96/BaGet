@@ -12,6 +12,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using BaGet.Core.Entities;
 
 namespace BaGet.Core
 {
@@ -29,7 +30,7 @@ namespace BaGet.Core
         private readonly ILogger _logger;
 
         public V2UpstreamClient(
-            IOptionsSnapshot<MirrorOptions> options,
+            IOptions<MirrorOptions> options,
             ILogger logger)
         {
             if (options is null)

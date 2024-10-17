@@ -1,5 +1,6 @@
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
+using BaGet.Core.Entities;
 
 namespace BaGet.Core
 {
@@ -14,18 +15,18 @@ namespace BaGet.Core
         /// The dependency's package ID. Null if this is a dependency group without any dependencies.
         /// </summary>
         [Unicode]
-        [MaxLength(AbstractContext<DbContext>.MaxPackageIdLength)]
+        [MaxLength(BaGetDbContext.MaxPackageIdLength)]
         public string? Id { get; set; }
 
         /// <summary>
         /// The dependency's package version. Null if this is a dependency group without any dependencies.
         /// </summary>
         [Unicode]
-        [MaxLength(AbstractContext<DbContext>.MaxPackageDependencyVersionRangeLength)]
+        [MaxLength(BaGetDbContext.MaxPackageDependencyVersionRangeLength)]
         public string? VersionRange { get; set; }
 
         [Unicode]
-        [MaxLength(AbstractContext<DbContext>.MaxTargetFrameworkLength)]
+        [MaxLength(BaGetDbContext.MaxTargetFrameworkLength)]
         public string? TargetFramework { get; set; }
 
         public Package? Package { get; set; }

@@ -1,4 +1,5 @@
 using System.ComponentModel.DataAnnotations;
+using BaGet.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 
 namespace BaGet.Core
@@ -10,10 +11,10 @@ namespace BaGet.Core
         [Key]
         public int Key { get; set; }
         [Unicode]
-        [MaxLength(AbstractContext<DbContext>.MaxPackageTypeNameLength)]
+        [MaxLength(BaGetDbContext.MaxPackageTypeNameLength)]
         public string? Name { get; set; }
         [Unicode]
-        [MaxLength(AbstractContext<DbContext>.MaxPackageTypeVersionLength)]
+        [MaxLength(BaGetDbContext.MaxPackageTypeVersionLength)]
         public string? Version { get; set; }
 
         public Package Package { get; set; } = null!;

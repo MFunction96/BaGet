@@ -1,13 +1,13 @@
-using System;
-using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
-using Microsoft.Extensions.DependencyInjection.Extensions;
+using System;
+using System.Collections.Generic;
+using BaGet.Core.Configuration;
 
-namespace BaGet.Core
+namespace BaGet.Core.Extensions
 {
-    public static partial class DependencyInjectionExtensions
+    public static class DependencyInjectionExtensions
     {
         private static readonly string DatabaseTypeKey = $"{nameof(BaGetOptions.Database)}:{nameof(DatabaseOptions.Type)}";
         private static readonly string SearchTypeKey = $"{nameof(BaGetOptions.Search)}:{nameof(SearchOptions.Type)}";
@@ -41,7 +41,7 @@ namespace BaGet.Core
         /// <returns>Whether the database type is active.</returns>
         public static bool HasDatabaseType(this IConfiguration config, string value)
         {
-            return config[DatabaseTypeKey].Equals(value, StringComparison.OrdinalIgnoreCase);
+            return config[DatabaseTypeKey]?.Equals(value, StringComparison.OrdinalIgnoreCase) ?? false;
         }
 
         /// <summary>
@@ -52,7 +52,7 @@ namespace BaGet.Core
         /// <returns>Whether the search type is active.</returns>
         public static bool HasSearchType(this IConfiguration config, string value)
         {
-            return config[SearchTypeKey].Equals(value, StringComparison.OrdinalIgnoreCase);
+            return config[SearchTypeKey]?.Equals(value, StringComparison.OrdinalIgnoreCase) ?? false;
         }
 
         /// <summary>
@@ -63,51 +63,7 @@ namespace BaGet.Core
         /// <returns>Whether the database type is active.</returns>
         public static bool HasStorageType(this IConfiguration config, string value)
         {
-            return config[StorageTypeKey].Equals(value, StringComparison.OrdinalIgnoreCase);
-        }
-
-        public static IServiceCollection AddBaGetDbContextProvider<TContext>(
-            this IServiceCollection services,
-            string databaseType,
-            Action<IServiceProvider, DbContextOptionsBuilder> configureContext)
-            where TContext : DbContext, IContext
-        {
-            services.TryAddScoped<IContext>(provider => provider.GetRequiredService<TContext>());
-            services.TryAddTransient<IPackageDatabase>(provider => provider.GetRequiredService<PackageDatabase>());
-
-            services.AddDbContext<TContext>(configureContext);
-
-            services.AddProvider<IContext>((provider, config) =>
-            {
-                if (!config.HasDatabaseType(databaseType)) return null;
-
-                return provider.GetRequiredService<TContext>();
-            });
-
-            services.AddProvider<IPackageDatabase>((provider, config) =>
-            {
-                if (!config.HasDatabaseType(databaseType)) return null;
-
-                return provider.GetRequiredService<PackageDatabase>();
-            });
-
-            services.AddProvider<ISearchIndexer>((provider, config) =>
-            {
-                if (!config.HasSearchType(DatabaseSearchType)) return null;
-                if (!config.HasDatabaseType(databaseType)) return null;
-
-                return provider.GetRequiredService<NullSearchIndexer>();
-            });
-
-            services.AddProvider<ISearchService>((provider, config) =>
-            {
-                if (!config.HasSearchType(DatabaseSearchType)) return null;
-                if (!config.HasDatabaseType(databaseType)) return null;
-
-                return provider.GetRequiredService<DatabaseSearchService>();
-            });
-
-            return services;
+            return config[StorageTypeKey]?.Equals(value, StringComparison.OrdinalIgnoreCase) ?? false;
         }
 
         /// <summary>

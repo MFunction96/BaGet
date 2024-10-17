@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using BaGet.Core.Entities;
 using BaGet.Protocol;
 using BaGet.Protocol.Models;
 using NuGet.Versioning;

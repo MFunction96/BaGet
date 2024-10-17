@@ -16,7 +16,7 @@ namespace BaGet.Core
 
         private readonly string _storePath;
 
-        public FileStorageService(IOptionsSnapshot<FileSystemStorageOptions> options)
+        public FileStorageService(IOptions<FileSystemStorageOptions> options)
         {
             if (options == null) throw new ArgumentNullException(nameof(options));
 

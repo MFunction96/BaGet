@@ -1,5 +1,6 @@
 using System.Collections.Generic;
 using System.Threading.Tasks;
+using BaGet.Core.Entities;
 using Moq;
 using Xunit;
 
@@ -191,12 +192,12 @@ namespace BaGet.Core.Tests.Services
 
         public class FactsBase
         {
-            protected readonly Mock<IContext> _context;
+            protected readonly Mock<BaGetDbContext> _context;
             protected readonly PackageDatabase _target;
 
             public FactsBase()
             {
-                _context = new Mock<IContext>();
+                _context = new Mock<BaGetDbContext>();
                 _target = new PackageDatabase(_context.Object);
             }
         }
