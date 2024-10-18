@@ -8,33 +8,15 @@ using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NuGet.Packaging;
 
-namespace BaGet.Core
+namespace BaGet.Core.Indexing
 {
-    public class PackageIndexingService : IPackageIndexingService
+    public class PackageIndexingService(
+        IPackageDatabase packages,
+        IPackageStorageService storage,
+        IOptions<BaGetOptions> options,
+        ILogger<PackageIndexingService> logger)
+        : IPackageIndexingService
     {
-        private readonly IPackageDatabase _packages;
-        private readonly IPackageStorageService _storage;
-        private readonly ISearchIndexer _search;
-        private readonly SystemTime _time;
-        private readonly IOptions<BaGetOptions> _options;
-        private readonly ILogger<PackageIndexingService> _logger;
-
-        public PackageIndexingService(
-            IPackageDatabase packages,
-            IPackageStorageService storage,
-            ISearchIndexer search,
-            SystemTime time,
-            IOptions<BaGetOptions> options,
-            ILogger<PackageIndexingService> logger)
-        {
-            _packages = packages ?? throw new ArgumentNullException(nameof(packages));
-            _storage = storage ?? throw new ArgumentNullException(nameof(storage));
-            _search = search ?? throw new ArgumentNullException(nameof(search));
-            _time = time ?? throw new ArgumentNullException(nameof(time));
-            _options = options ?? throw new ArgumentNullException(nameof(options));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
-
         public async Task<PackageIndexingResult> IndexAsync(Stream packageStream, CancellationToken cancellationToken)
         {
             // Try to extract all the necessary information from the package.
@@ -48,7 +30,7 @@ namespace BaGet.Core
                 using (var packageReader = new PackageArchiveReader(packageStream, leaveStreamOpen: true))
                 {
                     package = packageReader.GetPackageMetadata();
-                    package.Published = _time.UtcNow;
+                    package.Published = DateTime.UtcNow;
 
                     nuspecStream = await packageReader.GetNuspecAsync(cancellationToken);
                     nuspecStream = await nuspecStream.AsTemporaryFileStreamAsync(cancellationToken);
@@ -76,26 +58,26 @@ namespace BaGet.Core
             }
             catch (Exception e)
             {
-                _logger.LogError(e, "Uploaded package is invalid");
+                logger.LogError(e, "Uploaded package is invalid");
 
                 return PackageIndexingResult.InvalidPackage;
             }
 
             // The package is well-formed. Ensure this is a new package.
-            if (await _packages.ExistsAsync(package.Id, package.Version, cancellationToken))
+            if (await packages.ExistsAsync(package.Id, package.Version, cancellationToken))
             {
-                if (!_options.Value.AllowPackageOverwrites)
+                if (!options.Value.AllowPackageOverwrites)
                 {
                     return PackageIndexingResult.PackageAlreadyExists;
                 }
 
-                await _packages.HardDeletePackageAsync(package.Id, package.Version, cancellationToken);
-                await _storage.DeleteAsync(package.Id, package.Version, cancellationToken);
+                await packages.HardDeletePackageAsync(package.Id, package.Version, cancellationToken);
+                await storage.DeleteAsync(package.Id, package.Version, cancellationToken);
             }
 
             // TODO: Add more package validations
             // TODO: Call PackageArchiveReader.ValidatePackageEntriesAsync
-            _logger.LogInformation(
+            logger.LogInformation(
                 "Validated package {PackageId} {PackageVersion}, persisting content to storage...",
                 package.Id,
                 package.NormalizedVersionString);
@@ -104,7 +86,7 @@ namespace BaGet.Core
             {
                 packageStream.Position = 0;
 
-                await _storage.SavePackageContentAsync(
+                await storage.SavePackageContentAsync(
                     package,
                     packageStream,
                     nuspecStream,
@@ -117,7 +99,7 @@ namespace BaGet.Core
                 // This may happen due to concurrent pushes.
                 // TODO: Make IPackageStorageService.SavePackageContentAsync return a result enum so this
                 // can be properly handled.
-                _logger.LogError(
+                logger.LogError(
                     e,
                     "Failed to persist package {PackageId} {PackageVersion} content to storage",
                     package.Id,
@@ -126,15 +108,15 @@ namespace BaGet.Core
                 throw;
             }
 
-            _logger.LogInformation(
+            logger.LogInformation(
                 "Persisted package {Id} {Version} content to storage, saving metadata to database...",
                 package.Id,
                 package.NormalizedVersionString);
 
-            var result = await _packages.AddAsync(package, cancellationToken);
+            var result = await packages.AddAsync(package, cancellationToken);
             if (result == PackageAddResult.PackageAlreadyExists)
             {
-                _logger.LogWarning(
+                logger.LogWarning(
                     "Package {Id} {Version} metadata already exists in database",
                     package.Id,
                     package.NormalizedVersionString);
@@ -144,20 +126,13 @@ namespace BaGet.Core
 
             if (result != PackageAddResult.Success)
             {
-                _logger.LogError($"Unknown {nameof(PackageAddResult)} value: {{PackageAddResult}}", result);
+                logger.LogError($"Unknown {nameof(PackageAddResult)} value: {{PackageAddResult}}", result);
 
                 throw new InvalidOperationException($"Unknown {nameof(PackageAddResult)} value: {result}");
             }
 
-            _logger.LogInformation(
+            logger.LogInformation(
                 "Successfully persisted package {Id} {Version} metadata to database. Indexing in search...",
-                package.Id,
-                package.NormalizedVersionString);
-
-            await _search.IndexAsync(package, cancellationToken);
-
-            _logger.LogInformation(
-                "Successfully indexed package {Id} {Version} in search",
                 package.Id,
                 package.NormalizedVersionString);
 

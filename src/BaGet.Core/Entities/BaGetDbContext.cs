@@ -1,10 +1,8 @@
-using System.Threading;
-using System.Threading.Tasks;
 using Microsoft.EntityFrameworkCore;
 
 namespace BaGet.Core.Entities
 {
-    public abstract class BaGetDbContext(DbContextOptions<BaGetDbContext> options) : DbContext(options)
+    public class BaGetDbContext(DbContextOptions<BaGetDbContext> options) : DbContext(options)
     {
         public const int MaxPackageIdLength = 128;
         public const int MaxPackageVersionLength = 64;
@@ -22,15 +20,6 @@ namespace BaGet.Core.Entities
         public DbSet<PackageDependency> PackageDependencies { get; set; }
         public DbSet<PackageType> PackageTypes { get; set; }
         public DbSet<TargetFramework> TargetFrameworks { get; set; }
-
-        public Task<int> SaveChangesAsync() => SaveChangesAsync(default);
-
-        public virtual async Task RunMigrationsAsync(CancellationToken cancellationToken)
-            => await Database.MigrateAsync(cancellationToken);
-
-        public abstract bool IsUniqueConstraintViolationException(DbUpdateException exception);
-
-        public virtual bool SupportsLimitInSubqueries => true;
 
         protected override void OnModelCreating(ModelBuilder builder)
         {

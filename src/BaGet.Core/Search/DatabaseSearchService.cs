@@ -41,16 +41,17 @@ namespace BaGet.Core.Search
             // the package IDs in a subquery. Otherwise, run two queries:
             //   1. Find the package IDs that match the search
             //   2. Find all package versions for these package IDs
-            if (context.SupportsLimitInSubqueries)
-            {
-                search = context.Packages.Where(p => packageIds.Contains(p.Id));
-            }
-            else
-            {
-                var packageIdResults = await packageIds.ToListAsync(cancellationToken);
+            //if (context.SupportsLimitInSubqueries)
+            //{
+            //    search = context.Packages.Where(p => packageIds.Contains(p.Id));
+            //}
+            //else
+            //{
 
-                search = context.Packages.Where(p => packageIdResults.Contains(p.Id));
-            }
+            //}
+            var packageIdResults = await packageIds.ToListAsync(cancellationToken);
+
+            search = context.Packages.Where(p => packageIdResults.Contains(p.Id));
 
             search = ApplySearchFilters(
                 search,

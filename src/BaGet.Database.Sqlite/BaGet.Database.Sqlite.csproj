@@ -3,6 +3,7 @@
   <PropertyGroup>
     <PackageTags>NuGet</PackageTags>
     <Description>The libraries to host BaGet on SQLite.</Description>
+    <BaseOutputPath>..\BaGet\bin\</BaseOutputPath>
   </PropertyGroup>
 
   <ItemGroup>

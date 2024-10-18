@@ -72,12 +72,6 @@ namespace BaGet.Tests
                 .ConfigureServices((context, services) =>
                 {
                     // Make time deterministic for testing purposes.
-                    var time = new Mock<SystemTime>();
-                    time
-                        .Setup(t => t.UtcNow)
-                        .Returns(DateTime.Parse("2020-01-01T00:00:00.000Z"));
-
-                    services.AddSingleton(time.Object);
                     if (_upstreamClient != null)
                     {
                         services.AddSingleton(_upstreamClient);

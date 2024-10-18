@@ -3,22 +3,15 @@
   <PropertyGroup>
     <PackageTags>NuGet</PackageTags>
     <Description>The libraries to host BaGet on MariaDB.</Description>
+    <BaseOutputPath>..\BaGet\bin\</BaseOutputPath>
   </PropertyGroup>
 
   <ItemGroup>
-    <PackageReference Include="Microsoft.EntityFrameworkCore.Tools" Version="$(DotNetMajorVersion)">
-      <PrivateAssets>all</PrivateAssets>
-      <IncludeAssets>runtime; build; native; contentfiles; analyzers; buildtransitive</IncludeAssets>
-    </PackageReference>
     <PackageReference Include="Pomelo.EntityFrameworkCore.MySql" Version="$(DotNetMajorVersion)" />
   </ItemGroup>
 
   <ItemGroup>
     <ProjectReference Include="..\BaGet.Core\BaGet.Core.csproj" />
-  </ItemGroup>
-
-  <ItemGroup>
-    <PackageReference Update="Microsoft.SourceLink.GitHub" Version="*" />
   </ItemGroup>
 
 </Project>

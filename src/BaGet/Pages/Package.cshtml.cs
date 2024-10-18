@@ -106,8 +106,8 @@ namespace BaGet.Pages
 
             IconUrl = Package.HasEmbeddedIcon
                 ? _url.GetPackageIconDownloadUrl(Package.Id, packageVersion)
-                : (Package.IconUrl ?? string.Empty);
-            LicenseUrl = Package.LicenseUrl ?? string.Empty;
+                : (Package.IconUrl?.AbsoluteUri ?? string.Empty);
+            LicenseUrl = Package.LicenseUrl?.AbsoluteUri ?? string.Empty;
             PackageDownloadUrl = _url.GetPackageDownloadUrl(Package.Id, packageVersion);
         }
 

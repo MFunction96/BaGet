@@ -164,10 +164,10 @@ namespace BaGet.Core.Tests
                 Assert.Equal(SemVerLevel.SemVer2, package.SemVerLevel);
                 Assert.Equal("Summary", package.Summary);
                 Assert.Equal("Title", package.Title);
-                Assert.Equal("https://icon.test/", package.IconUrl);
-                Assert.Equal("https://license.test/", package.LicenseUrl);
-                Assert.Equal("", package.ProjectUrl);
-                Assert.Equal("", package.RepositoryUrl);
+                Assert.Equal("https://icon.test/", package.IconUrl?.AbsoluteUri);
+                Assert.Equal("https://license.test/", package.LicenseUrl?.AbsoluteUri);
+                Assert.Equal("", package.ProjectUrl?.AbsoluteUri);
+                Assert.Equal("", package.RepositoryUrl?.AbsoluteUri);
                 Assert.Null(package.RepositoryType);
                 Assert.Equal(new[] { "Tag1", "Tag2" }, package.Tags);
                 Assert.Equal("1.2.3-prerelease", package.NormalizedVersionString);

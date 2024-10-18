@@ -67,19 +67,10 @@ namespace BaGet.Core.Entities
         [Unicode]
         [MaxLength(BaGetDbContext.MaxPackageTitleLength)]
         public string Title { get; set; } = string.Empty;
-
-        [Unicode]
-        [Column(TypeName = "text")]
-        public string? IconUrl { get; set; }
-        [Unicode]
-        [Column(TypeName = "text")]
-        public string? LicenseUrl { get; set; }
-        [Unicode]
-        [Column(TypeName = "text")]
-        public string? ProjectUrl { get; set; }
-        [Unicode]
-        [Column(TypeName = "text")]
-        public string? RepositoryUrl { get; set; }
+        public Uri? IconUrl { get; set; }
+        public Uri? LicenseUrl { get; set; }
+        public Uri? ProjectUrl { get; set; }
+        public Uri? RepositoryUrl { get; set; }
         [Unicode]
         [MaxLength(BaGetDbContext.MaxRepositoryTypeLength)]
         public string RepositoryType { get; set; } = string.Empty;

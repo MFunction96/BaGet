@@ -24,7 +24,7 @@ namespace BaGet.Core
                 var latest = versions.First();
                 var iconUrl = latest.HasEmbeddedIcon
                     ? _url.GetPackageIconDownloadUrl(latest.Id, latest.Version)
-                    : latest.IconUrl;
+                    : latest.IconUrl?.AbsoluteUri;
 
                 result.Add(new SearchResult
                 {
@@ -33,8 +33,8 @@ namespace BaGet.Core
                     Description = latest.Description,
                     Authors = latest.Authors.ToList(),
                     IconUrl = iconUrl,
-                    LicenseUrl = latest.LicenseUrl ?? string.Empty,
-                    ProjectUrl = latest.ProjectUrl ?? string.Empty,
+                    LicenseUrl = latest.LicenseUrl?.AbsoluteUri ?? string.Empty,
+                    ProjectUrl = latest.ProjectUrl?.AbsoluteUri ?? string.Empty,
                     RegistrationIndexUrl = _url.GetRegistrationIndexUrl(latest.Id),
                     Summary = latest.Summary,
                     Tags = latest.Tags?.ToList() ?? new List<string>(),

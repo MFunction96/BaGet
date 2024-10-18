@@ -2,13 +2,13 @@
 
   <!-- Package properties -->
   <PropertyGroup>
-    <Authors>Loic Sharma</Authors>
-    <Copyright>Copyright (c) Loic Sharma 2021</Copyright>
+    <Authors>MFunction;Loic Sharma</Authors>
+    <Copyright>Copyright (c) Xanadu 2024, Loic Sharma 2021</Copyright>
     <Product>BaGet</Product>
     <PackageIcon>packageIcon.png</PackageIcon>
-    <PackageLicenseExpression>MIT</PackageLicenseExpression>
+    <PackageLicenseExpression>AGPL-3.0</PackageLicenseExpression>
     <PackageVersion Condition="'$(PackageVersion)' == ''">0.1.0-prerelease</PackageVersion>
-    <PackageProjectUrl>https://loic-sharma.github.io/BaGet/</PackageProjectUrl>
+    <PackageProjectUrl>https://github.com/MFunction96/BaGet/;https://loic-sharma.github.io/BaGet/</PackageProjectUrl>
   </PropertyGroup>
 
   <!-- Compiler properties -->
@@ -37,10 +37,6 @@
   <PropertyGroup Condition="'$(CI)' == 'true'">
     <ContinuousIntegrationBuild>true</ContinuousIntegrationBuild>
   </PropertyGroup>
-
-  <ItemGroup Condition="'$(DOTNET_RUNNING_IN_CONTAINER)' == ''">
-    <PackageReference Include="Microsoft.SourceLink.GitHub" Version="*" PrivateAssets="All"/>
-  </ItemGroup>
 
   <ItemGroup>
     <None Include="../packageIcon.png" Pack="true" PackagePath="" Visible="false" />

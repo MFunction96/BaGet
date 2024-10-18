@@ -47,6 +47,7 @@ namespace BaGet.Core.Configuration
 
         public SearchOptions Search { get; set; }
 
-        public MirrorOptions Mirror { get; set; }
+        // TODO: Reconstruct the Mirror feature.
+        // public MirrorOptions Mirror { get; set; }
     }
 }

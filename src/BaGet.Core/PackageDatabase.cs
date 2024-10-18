@@ -22,7 +22,6 @@ namespace BaGet.Core
                 return PackageAddResult.Success;
             }
             catch (DbUpdateException e)
-                when (context.IsUniqueConstraintViolationException(e))
             {
                 return PackageAddResult.PackageAlreadyExists;
             }

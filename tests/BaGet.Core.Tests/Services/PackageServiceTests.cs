@@ -105,11 +105,11 @@ namespace BaGet.Core.Tests
                         _cancellationToken))
                     .ReturnsAsync(localPackages);
 
-                _upstream
-                    .Setup(u => u.ListPackageVersionsAsync(
-                        "MyPackage",
-                        _cancellationToken))
-                    .ReturnsAsync(upstreamPackages);
+                //_upstream
+                //    .Setup(u => u.ListPackageVersionsAsync(
+                //        "MyPackage",
+                //        _cancellationToken))
+                //    .ReturnsAsync(upstreamPackages);
             }
         }
 
@@ -195,11 +195,11 @@ namespace BaGet.Core.Tests
                         _cancellationToken))
                     .ReturnsAsync(localPackages);
 
-                _upstream
-                    .Setup(u => u.ListPackagesAsync(
-                        "MyPackage",
-                        _cancellationToken))
-                    .ReturnsAsync(upstreamPackages);
+                //_upstream
+                //    .Setup(u => u.ListPackagesAsync(
+                //        "MyPackage",
+                //        _cancellationToken))
+                //    .ReturnsAsync(upstreamPackages);
             }
         }
 
@@ -295,9 +295,9 @@ namespace BaGet.Core.Tests
                     .Setup(p => p.ExistsAsync(_id, _version, _cancellationToken))
                     .ReturnsAsync(false);
 
-                _upstream
-                    .Setup(u => u.DownloadPackageOrNullAsync(_id, _version, _cancellationToken))
-                    .ReturnsAsync((Stream)null);
+                //_upstream
+                //    .Setup(u => u.DownloadPackageOrNullAsync(_id, _version, _cancellationToken))
+                //    .ReturnsAsync((Stream)null);
 
                 await TargetAsync();
 
@@ -313,9 +313,9 @@ namespace BaGet.Core.Tests
                     .Setup(p => p.ExistsAsync(_id, _version, _cancellationToken))
                     .ReturnsAsync(false);
 
-                _upstream
-                    .Setup(u => u.DownloadPackageOrNullAsync(_id, _version, _cancellationToken))
-                    .ThrowsAsync(new InvalidOperationException("Hello world"));
+                //_upstream
+                //    .Setup(u => u.DownloadPackageOrNullAsync(_id, _version, _cancellationToken))
+                //    .ThrowsAsync(new InvalidOperationException("Hello world"));
 
                 await TargetAsync();
 
@@ -333,9 +333,9 @@ namespace BaGet.Core.Tests
 
                 using (var downloadStream = new MemoryStream())
                 {
-                    _upstream
-                        .Setup(u => u.DownloadPackageOrNullAsync(_id, _version, _cancellationToken))
-                        .ReturnsAsync(downloadStream);
+                    //_upstream
+                    //    .Setup(u => u.DownloadPackageOrNullAsync(_id, _version, _cancellationToken))
+                    //    .ReturnsAsync(downloadStream);
 
                     await TargetAsync();
 
@@ -365,7 +365,6 @@ namespace BaGet.Core.Tests
         public class FactsBase
         {
             protected readonly Mock<IPackageDatabase> _db;
-            protected readonly Mock<IUpstreamClient> _upstream;
             protected readonly Mock<IPackageIndexingService> _indexer;
 
             protected readonly CancellationToken _cancellationToken = CancellationToken.None;
@@ -374,12 +373,10 @@ namespace BaGet.Core.Tests
             protected FactsBase()
             {
                 _db = new Mock<IPackageDatabase>();
-                _upstream = new Mock<IUpstreamClient>();
                 _indexer = new Mock<IPackageIndexingService>();
 
                 _target = new PackageService(
                     _db.Object,
-                    _upstream.Object,
                     _indexer.Object,
                     Mock.Of<ILogger<PackageService>>());
             }

@@ -1,97 +1,117 @@
 using BaGet;
 using BaGet.Core;
+using BaGet.Core.Authentication;
 using BaGet.Core.Configuration;
 using BaGet.Core.Entities;
-using BaGet.Core.Extensions;
-using BaGet.Database.Mariadb;
-using BaGet.Database.Sqlite;
+using BaGet.Core.Indexing;
+using BaGet.Core.Search;
+using BaGet.Core.Upstream;
 using BaGet.Extensions;
+using Humanizer.Configuration;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.EntityFrameworkCore.Storage;
 using Microsoft.Extensions.Configuration;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Hosting;
 using Microsoft.Extensions.Options;
+using Serilog;
 using System;
-using DependencyInjectionExtensions = BaGet.Core.Extensions.DependencyInjectionExtensions;
+using System.Text;
 
-var builder = WebApplication.CreateBuilder(args);
+var applicationBuilder = WebApplication.CreateBuilder(args);
+
+applicationBuilder.Services.AddLogging(builder => builder.AddSerilog());
+// 注册日志文件输出，48MB大小限制
+applicationBuilder.Services.AddSerilog(configuration => configuration
+    .Enrich.FromLogContext()
+    .WriteTo.File("BaGet.log", encoding: Encoding.UTF8, fileSizeLimitBytes: 50331648));
 
 // Add Options to bind configuration.
-builder.Services.AddOptions<BaGetOptions>().Bind(builder.Configuration).ValidateDataAnnotations();
-builder.Services.AddOptions<DatabaseOptions>().Bind(builder.Configuration.GetSection(nameof(BaGetOptions.Database)))
+applicationBuilder.Services.AddOptions<BaGetOptions>().Bind(applicationBuilder.Configuration).ValidateDataAnnotations();
+applicationBuilder.Services.AddOptions<DatabaseOptions>().Bind(applicationBuilder.Configuration.GetSection(nameof(BaGetOptions.Database)))
     .ValidateDataAnnotations();
-builder.Services.AddOptions<StorageOptions>().Bind(builder.Configuration.GetSection(nameof(BaGetOptions.Storage)))
+applicationBuilder.Services.AddOptions<StorageOptions>().Bind(applicationBuilder.Configuration.GetSection(nameof(BaGetOptions.Storage)))
     .ValidateDataAnnotations();
-builder.Services.AddOptions<SearchOptions>().Bind(builder.Configuration.GetSection(nameof(BaGetOptions.Search)))
+applicationBuilder.Services.AddOptions<SearchOptions>().Bind(applicationBuilder.Configuration.GetSection(nameof(BaGetOptions.Search)))
     .ValidateDataAnnotations();
-builder.Services.AddOptions<FileSystemStorageOptions>()
-    .Bind(builder.Configuration.GetSection(nameof(BaGetOptions.Storage))).ValidateDataAnnotations();
-builder.Services.AddOptions<MirrorOptions>().Bind(builder.Configuration.GetSection(nameof(BaGetOptions.Mirror)))
-    .ValidateDataAnnotations();
+applicationBuilder.Services.AddOptions<FileSystemStorageOptions>()
+    .Bind(applicationBuilder.Configuration.GetSection(nameof(BaGetOptions.Storage))).ValidateDataAnnotations();
+// TODO: Reconstruct the Mirror feature because it is not cable to be used on HttpClient.
+// applicationBuilder.Services.AddOptions<MirrorOptions>().Bind(applicationBuilder.Configuration.GetSection(nameof(BaGetOptions.Mirror))).ValidateDataAnnotations();
 
 // Configure the forwarded headers middleware to forward the X-Forwarded-For and X-Forwarded-Proto headers.
-builder.Services.Configure<ForwardedHeadersOptions>(options =>
+applicationBuilder.Services.Configure<ForwardedHeadersOptions>(options =>
 {
     options.ForwardedHeaders = ForwardedHeaders.All;
 });
 
-
-builder.Services.AddDbContext<BaGetDbContext>((provider, builder) =>
-{
-    var databaseOptions = provider.GetRequiredService<IOptions<DatabaseOptions>>().Value;
-    switch (databaseOptions.Type.ToLowerInvariant()) // 将 Type 转为小写以忽略大小写
+// Add DbContext, using the database type specified in the configuration.
+applicationBuilder.Services.AddDbContext<BaGetDbContext>((provider, builder) =>
     {
-        case "mariadb":
-            builder.UseMySql(databaseOptions.ConnectionString,
-                ServerVersion.AutoDetect(databaseOptions.ConnectionString));
-            break;
-        case "sqlite":
-            builder.UseSqlite(databaseOptions.ConnectionString);
-            break;
-        default:
-            throw new InvalidOperationException($"Unsupported database type: {databaseOptions.Type}");
+        var options = provider.GetRequiredService<IOptions<DatabaseOptions>>().Value;
+        _ = options.Type.ToLowerInvariant() switch
+        {
+            "mariadb" => builder.UseMySql(options.ConnectionString, ServerVersion.AutoDetect(options.ConnectionString),
+                x => x.MigrationsAssembly("BaGet.Database.Mariadb")),
+            "sqlite" => builder.UseSqlite(options.ConnectionString,
+                x => x.MigrationsAssembly("BaGet.Database.Sqlite")),
+            _ => throw new ArgumentOutOfRangeException(nameof(options.Type), "Unsupported Database!")
+        };
     }
-});
+);
 
-builder.Services.AddBaGetWebApplication(app =>
+// Add ASP.NET Core base services.
+applicationBuilder.Services.AddRouting(options => options.LowercaseUrls = true);
+applicationBuilder.Services.AddRazorPages();
+applicationBuilder.Services.AddControllers();
+applicationBuilder.Services.AddHttpContextAccessor();
+
+// Add BaGet services in ordered.
+applicationBuilder.Services.AddScoped<IPackageDatabase, PackageDatabase>();
+applicationBuilder.Services.AddHttpClient<IPackageDownloadsSource, PackageDownloadsJsonSource>();
+applicationBuilder.Services.AddSingleton<IFrameworkCompatibilityService, FrameworkCompatibilityService>();
+applicationBuilder.Services.AddTransient<IUrlGenerator, BaGetUrlGenerator>();
+applicationBuilder.Services.AddSingleton<ISearchResponseBuilder, SearchResponseBuilder>();
+applicationBuilder.Services.AddSingleton<RegistrationBuilder>();
+applicationBuilder.Services.AddScoped<DownloadsImporter>();
+applicationBuilder.Services.AddTransient<IAuthenticationService, ApiKeyAuthenticationService>();
+applicationBuilder.Services.AddSingleton<IStorageService, FileStorageService>();
+applicationBuilder.Services.AddTransient<IPackageStorageService, PackageStorageService>();
+applicationBuilder.Services.AddTransient<IPackageContentService, DefaultPackageContentService>();
+applicationBuilder.Services.AddTransient<IPackageDeletionService, PackageDeletionService>();
+applicationBuilder.Services.AddTransient<IPackageIndexingService, PackageIndexingService>();
+applicationBuilder.Services.AddTransient<IPackageService, PackageService>();
+applicationBuilder.Services.AddTransient<IPackageMetadataService, DefaultPackageMetadataService>();
+applicationBuilder.Services.AddTransient<IServiceIndexService, BaGetServiceIndex>();
+applicationBuilder.Services.AddTransient<ISymbolStorageService, SymbolStorageService>();
+applicationBuilder.Services.AddTransient<ISymbolIndexingService, SymbolIndexingService>();
+applicationBuilder.Services.AddTransient<ISearchService, DatabaseSearchService>();
+
+applicationBuilder.Services.AddCors(options =>
 {
-
-    // Add storage providers.
-    app.AddFileStorage();
-
-    // Add search providers.
+    options.AddPolicy("DevelopCors", policy =>
+    {
+        policy.AllowAnyHeader()
+            .AllowAnyMethod()
+            .AllowAnyOrigin();
+    });
 });
 
-// You can swap between implementations of subsystems like storage and search using BaGet's configuration.
-// Each subsystem's implementation has a provider that reads the configuration to determine if it should be
-// activated. BaGet will run through all its providers until it finds one that is active.
-builder.Services.AddTransient(DependencyInjectionExtensions.GetServiceFromProviders<IStorageService>);
-builder.Services.AddTransient(DependencyInjectionExtensions.GetServiceFromProviders<IPackageDatabase>);
-builder.Services.AddTransient(DependencyInjectionExtensions.GetServiceFromProviders<ISearchService>);
-builder.Services.AddTransient(DependencyInjectionExtensions.GetServiceFromProviders<ISearchIndexer>);
-builder.Services.AddTransient<IUrlGenerator, BaGetUrlGenerator>();
-builder.Services.AddRazorPages();
-builder.Services.AddRouting(options => options.LowercaseUrls = true);
-builder.Services.AddControllers();
-builder.Services.AddHttpContextAccessor();
-builder.Services.AddCors();
-
-
-
-var app = builder.Build();
+var app = applicationBuilder.Build();
+using (var scope = app.Services.CreateScope())
+{
+    var db = scope.ServiceProvider.GetRequiredService<BaGetDbContext>();
+    db.Database.Migrate();
+}
 var options = app.Configuration.Get<BaGetOptions>()!;
-
-// Add storage providers.
-
-
-// Add search providers.
 
 if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
     app.UseStatusCodePages();
+    app.UseCors("DevelopCors");
 }
 else
 {
