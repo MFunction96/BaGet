@@ -8,7 +8,6 @@
     <PackageReference Include="Microsoft.EntityFrameworkCore.Design" Version="$(DotNetMajorVersion)" />
     <PackageReference Include="Microsoft.Extensions.Options.DataAnnotations" Version="$(DotNetMajorVersion)" />
     <PackageReference Include="Microsoft.VisualStudio.Azure.Containers.Tools.Targets" Version="1.21.0" />
-    <PackageReference Include="Humanizer" Version="*" />
     <PackageReference Include="Markdig" Version="*" />
     <PackageReference Include="Serilog.AspNetCore" Version="$(DotNetMajorVersion)" />
     <PackageReference Include="Swashbuckle.AspNetCore" Version="*" />
