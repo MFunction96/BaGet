@@ -5,7 +5,9 @@ using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using BaGet.Core;
+using BaGet.Core.Content;
 using BaGet.Core.Entities;
+using BaGet.Core.Search;
 using Markdig;
 using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -14,32 +16,20 @@ using NuGet.Versioning;
 
 namespace BaGet.Pages
 {
-    public class PackageModel : PageModel
+    public class PackageModel(
+        IPackageService packages,
+        IPackageContentService content,
+        ISearchService search,
+        IUrlGenerator url)
+        : PageModel
     {
         private static readonly MarkdownPipeline MarkdownPipeline;
-
-        private readonly IPackageService _packages;
-        private readonly IPackageContentService _content;
-        private readonly ISearchService _search;
-        private readonly IUrlGenerator _url;
 
         static PackageModel()
         {
             MarkdownPipeline = new MarkdownPipelineBuilder()
                 .UseAdvancedExtensions()
                 .Build();
-        }
-
-        public PackageModel(
-            IPackageService packages,
-            IPackageContentService content,
-            ISearchService search,
-            IUrlGenerator url)
-        {
-            _packages = packages ?? throw new ArgumentNullException(nameof(packages));
-            _content = content ?? throw new ArgumentNullException(nameof(content));
-            _search = search ?? throw new ArgumentNullException(nameof(search));
-            _url = url ?? throw new ArgumentNullException(nameof(url));
         }
 
         public bool Found { get; private set; }
@@ -51,25 +41,25 @@ namespace BaGet.Pages
         public DateTime LastUpdated { get; private set; }
         public long TotalDownloads { get; private set; }
 
-        public IReadOnlyList<PackageDependent> UsedBy { get; set; }
-        public IReadOnlyList<DependencyGroupModel> DependencyGroups { get; private set; }
-        public IReadOnlyList<VersionModel> Versions { get; private set; }
+        public IReadOnlyList<PackageDependent> UsedBy { get; set; } = new List<PackageDependent>();
+        public IReadOnlyList<DependencyGroupModel> DependencyGroups { get; private set; } = new List<DependencyGroupModel>();
+        public IReadOnlyList<VersionModel> Versions { get; private set; } = new List<VersionModel>();
 
-        public HtmlString Readme { get; private set; }
+        public HtmlString Readme { get; private set; } = HtmlString.Empty;
 
-        public string IconUrl { get; private set; }
-        public string LicenseUrl { get; private set; }
-        public string PackageDownloadUrl { get; private set; }
+        public string IconUrl { get; private set; } = string.Empty;
+        public string LicenseUrl { get; private set; } = string.Empty;
+        public string PackageDownloadUrl { get; private set; } = string.Empty;
 
         public async Task OnGetAsync(string id, string version, CancellationToken cancellationToken)
         {
-            var packages = await _packages.FindPackagesAsync(id, cancellationToken);
-            var listedPackages = packages.Where(p => p.Listed).ToList();
+            var packages1 = await packages.FindPackagesAsync(id, cancellationToken);
+            var listedPackages = packages1.Where(p => p.Listed).ToList();
 
             // Try to find the requested version.
             if (NuGetVersion.TryParse(version, out var requestedVersion))
             {
-                Package = packages.SingleOrDefault(p => p.Version == requestedVersion);
+                Package = packages1.SingleOrDefault(p => p.Version == requestedVersion);
             }
 
             // Otherwise try to display the latest version.
@@ -90,10 +80,10 @@ namespace BaGet.Pages
             Found = true;
             IsDotnetTemplate = Package.PackageTypes.Any(t => t.Name.Equals("Template", StringComparison.OrdinalIgnoreCase));
             IsDotnetTool = Package.PackageTypes.Any(t => t.Name.Equals("DotnetTool", StringComparison.OrdinalIgnoreCase));
-            LastUpdated = packages.Max(p => p.Published);
-            TotalDownloads = packages.Sum(p => p.Downloads);
+            LastUpdated = packages1.Max(p => p.Published);
+            TotalDownloads = packages1.Sum(p => p.Downloads);
 
-            var dependents = await _search.FindDependentsAsync(Package.Id, cancellationToken);
+            var dependents = await search.FindDependentsAsync(Package.Id, cancellationToken);
 
             UsedBy = dependents.Data;
             DependencyGroups = ToDependencyGroups(Package);
@@ -105,10 +95,10 @@ namespace BaGet.Pages
             }
 
             IconUrl = Package.HasEmbeddedIcon
-                ? _url.GetPackageIconDownloadUrl(Package.Id, packageVersion)
+                ? url.GetPackageIconDownloadUrl(Package.Id, packageVersion)
                 : (Package.IconUrl?.AbsoluteUri ?? string.Empty);
             LicenseUrl = Package.LicenseUrl?.AbsoluteUri ?? string.Empty;
-            PackageDownloadUrl = _url.GetPackageDownloadUrl(Package.Id, packageVersion);
+            PackageDownloadUrl = url.GetPackageDownloadUrl(Package.Id, packageVersion);
         }
 
         private IReadOnlyList<DependencyGroupModel> ToDependencyGroups(Package package)
@@ -200,7 +190,7 @@ namespace BaGet.Pages
             CancellationToken cancellationToken)
         {
             string readme;
-            using (var readmeStream = await _content.GetPackageReadmeStreamOrNullAsync(packageId, packageVersion, cancellationToken))
+            using (var readmeStream = await content.GetPackageReadmeStreamOrNullAsync(packageId, packageVersion, cancellationToken))
             {
                 if (readmeStream == null) return null;
 

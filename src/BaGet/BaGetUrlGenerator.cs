@@ -1,5 +1,4 @@
 using BaGet.Core;
-using BaGet.Web;
 using Microsoft.AspNetCore.Http;
 using Microsoft.AspNetCore.Routing;
 using NuGet.Versioning;
@@ -14,9 +13,9 @@ namespace BaGet
         public string GetServiceIndexUrl()
         {
             return linkGenerator.GetUriByRouteValues(
-                httpContextAccessor.HttpContext,
+                httpContextAccessor.HttpContext!,
                 Routes.IndexRouteName,
-                values: null);
+                values: null)!;
         }
 
         public string GetPackageContentResourceUrl()

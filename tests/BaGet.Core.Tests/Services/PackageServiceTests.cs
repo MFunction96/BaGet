@@ -375,10 +375,11 @@ namespace BaGet.Core.Tests
                 _db = new Mock<IPackageDatabase>();
                 _indexer = new Mock<IPackageIndexingService>();
 
-                _target = new PackageService(
-                    _db.Object,
-                    _indexer.Object,
-                    Mock.Of<ILogger<PackageService>>());
+                _target = new PackageService(_db.Object);
+                //_target = new PackageService(
+                //    _db.Object,
+                //    _indexer.Object,
+                //    Mock.Of<ILogger<PackageService>>());
             }
         }
     }

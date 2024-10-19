@@ -2,7 +2,6 @@ using System;
 using System.Text.Json.Serialization;
 using BaGet.Controllers;
 using BaGet.Core;
-using BaGet.Web;
 using Microsoft.Extensions.DependencyInjection;
 
 namespace BaGet.Extensions

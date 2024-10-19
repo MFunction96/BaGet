@@ -1,28 +1,24 @@
-﻿using System;
-using System.Collections.Generic;
-using System.ComponentModel.DataAnnotations;
-using System.Threading;
-using System.Threading.Tasks;
 using BaGet.Core;
 using BaGet.Protocol.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
+using System;
+using System.Collections.Generic;
+using System.ComponentModel.DataAnnotations;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
+using BaGet.Core.Search;
 
-namespace BaGet.Web
+namespace BaGet.Pages
 {
-    public class IndexModel : PageModel
+    public class IndexModel(ISearchService search)
+        : PageModel
     {
-        private readonly ISearchService _search;
-
-        public IndexModel(ISearchService search)
-        {
-            _search = search ?? throw new ArgumentNullException(nameof(search));
-        }
-
         public const int ResultsPerPage = 20;
 
         [BindProperty(Name = "q", SupportsGet = true)]
-        public string Query { get; set; }
+        public string Query { get; set; } = string.Empty;
 
         [BindProperty(Name = "p", SupportsGet = true)]
         [Range(1, int.MaxValue)]
@@ -37,16 +33,14 @@ namespace BaGet.Web
         [BindProperty(SupportsGet = true)]
         public bool Prerelease { get; set; } = true;
 
-        public IReadOnlyList<SearchResult> Packages { get; private set; }
+        public IList<SearchResult> Packages { get; private set; } = new List<SearchResult>();
 
         public async Task<IActionResult> OnGetAsync(CancellationToken cancellationToken)
         {
-            if (!ModelState.IsValid) return BadRequest();
-
             var packageType = PackageType == "any" ? null : PackageType;
             var framework = Framework == "any" ? null : Framework;
 
-            var search = await _search.SearchAsync(
+            var search1 = await search.SearchAsync(
                 new SearchRequest
                 {
                     Skip = (PageIndex - 1) * ResultsPerPage,
@@ -59,7 +53,7 @@ namespace BaGet.Web
                 },
                 cancellationToken);
 
-            Packages = search.Data;
+            Packages = search1.Data.ToList();
 
             return Page();
         }

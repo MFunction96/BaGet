@@ -49,7 +49,7 @@ namespace BaGet.Core
         /// The metadata for single version of a package.
         /// Returns null if the package does not exist.
         /// </returns>
-        Task<Package> FindPackageOrNullAsync(string id, NuGetVersion version, CancellationToken cancellationToken);
+        Task<Package?> FindPackageOrNullAsync(string id, NuGetVersion version, CancellationToken cancellationToken);
 
         /// <summary>
         /// Determine whether a package exists locally or on the upstream source.

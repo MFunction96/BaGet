@@ -1,8 +1,7 @@
-using BaGet.Core;
+using BaGet.Core.Content;
 using BaGet.Protocol.Models;
 using Microsoft.AspNetCore.Mvc;
 using NuGet.Versioning;
-using System;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -12,19 +11,15 @@ namespace BaGet.Controllers
     /// The Package Content resource, used to download content from packages.
     /// See: https://docs.microsoft.com/en-us/nuget/api/package-base-address-resource
     /// </summary>
-    public class PackageContentController : Controller
+    [ApiController]
+    [Route("v3/package")]
+    public class PackageContentController(IPackageContentService content) : ControllerBase
     {
-        private readonly IPackageContentService _content;
-
-        public PackageContentController(IPackageContentService content)
-        {
-            _content = content ?? throw new ArgumentNullException(nameof(content));
-        }
-
+        [HttpGet("{id}/index.json")]
         public async Task<ActionResult<PackageVersionsResponse>> GetPackageVersionsAsync(string id, CancellationToken cancellationToken)
         {
-            var versions = await _content.GetPackageVersionsOrNullAsync(id, cancellationToken);
-            if (versions == null)
+            var versions = await content.GetPackageVersionsOrNullAsync(id, cancellationToken);
+            if (versions is null)
             {
                 return NotFound();
             }
@@ -32,6 +27,7 @@ namespace BaGet.Controllers
             return versions;
         }
 
+        [HttpGet("{id}/{version}/{idVersion}.nupkg")]
         public async Task<IActionResult> DownloadPackageAsync(string id, string version, CancellationToken cancellationToken)
         {
             if (!NuGetVersion.TryParse(version, out var nugetVersion))
@@ -39,8 +35,8 @@ namespace BaGet.Controllers
                 return NotFound();
             }
 
-            var packageStream = await _content.GetPackageContentStreamOrNullAsync(id, nugetVersion, cancellationToken);
-            if (packageStream == null)
+            var packageStream = await content.GetPackageContentStreamOrNullAsync(id, nugetVersion, cancellationToken);
+            if (packageStream is null)
             {
                 return NotFound();
             }
@@ -48,6 +44,7 @@ namespace BaGet.Controllers
             return File(packageStream, "application/octet-stream");
         }
 
+        [HttpGet("{id}/{version}/{id2}.nuspec")]
         public async Task<IActionResult> DownloadNuspecAsync(string id, string version, CancellationToken cancellationToken)
         {
             if (!NuGetVersion.TryParse(version, out var nugetVersion))
@@ -55,7 +52,7 @@ namespace BaGet.Controllers
                 return NotFound();
             }
 
-            var nuspecStream = await _content.GetPackageManifestStreamOrNullAsync(id, nugetVersion, cancellationToken);
+            var nuspecStream = await content.GetPackageManifestStreamOrNullAsync(id, nugetVersion, cancellationToken);
             if (nuspecStream == null)
             {
                 return NotFound();
@@ -64,6 +61,7 @@ namespace BaGet.Controllers
             return File(nuspecStream, "text/xml");
         }
 
+        [HttpGet("{id}/{version}/readme")]
         public async Task<IActionResult> DownloadReadmeAsync(string id, string version, CancellationToken cancellationToken)
         {
             if (!NuGetVersion.TryParse(version, out var nugetVersion))
@@ -71,7 +69,7 @@ namespace BaGet.Controllers
                 return NotFound();
             }
 
-            var readmeStream = await _content.GetPackageReadmeStreamOrNullAsync(id, nugetVersion, cancellationToken);
+            var readmeStream = await content.GetPackageReadmeStreamOrNullAsync(id, nugetVersion, cancellationToken);
             if (readmeStream == null)
             {
                 return NotFound();
@@ -80,6 +78,7 @@ namespace BaGet.Controllers
             return File(readmeStream, "text/markdown");
         }
 
+        [HttpGet("{id}/{version}/icon")]
         public async Task<IActionResult> DownloadIconAsync(string id, string version, CancellationToken cancellationToken)
         {
             if (!NuGetVersion.TryParse(version, out var nugetVersion))
@@ -87,7 +86,7 @@ namespace BaGet.Controllers
                 return NotFound();
             }
 
-            var iconStream = await _content.GetPackageIconStreamOrNullAsync(id, nugetVersion, cancellationToken);
+            var iconStream = await content.GetPackageIconStreamOrNullAsync(id, nugetVersion, cancellationToken);
             if (iconStream == null)
             {
                 return NotFound();

@@ -1,5 +1,4 @@
 using System;
-using BaGet.Web;
 using Microsoft.AspNetCore.Builder;
 
 namespace BaGet.Extensions

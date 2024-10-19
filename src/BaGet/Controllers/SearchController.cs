@@ -1,31 +1,27 @@
 using BaGet.Core;
 using BaGet.Protocol.Models;
 using Microsoft.AspNetCore.Mvc;
-using System;
 using System.Threading;
 using System.Threading.Tasks;
+using BaGet.Core.Search;
 
 namespace BaGet.Controllers
 {
-    public class SearchController : Controller
+    [ApiController]
+    [Route("v3")]
+    public class SearchController(ISearchService searchService) : ControllerBase
     {
-        private readonly ISearchService _searchService;
-
-        public SearchController(ISearchService searchService)
-        {
-            _searchService = searchService ?? throw new ArgumentNullException(nameof(searchService));
-        }
-
+        [HttpGet("search")]
         public async Task<ActionResult<SearchResponse>> SearchAsync(
-            [FromQuery(Name = "q")] string query = null,
+            [FromQuery(Name = "q")] string query = "",
             [FromQuery]int skip = 0,
             [FromQuery]int take = 20,
             [FromQuery]bool prerelease = false,
-            [FromQuery]string semVerLevel = null,
+            [FromQuery]string semVerLevel = "",
 
             // These are unofficial parameters
-            [FromQuery]string packageType = null,
-            [FromQuery]string framework = null,
+            [FromQuery]string packageType = "",
+            [FromQuery]string framework = "",
             CancellationToken cancellationToken = default)
         {
             var request = new SearchRequest
@@ -33,65 +29,71 @@ namespace BaGet.Controllers
                 Skip = skip,
                 Take = take,
                 IncludePrerelease = prerelease,
-                IncludeSemVer2 = semVerLevel == "2.0.0",
-                PackageType = packageType,
-                Framework = framework,
-                Query = query ?? string.Empty,
+                IncludeSemVer2 = semVerLevel.Trim() == "2.0.0",
+                PackageType = packageType.Trim(),
+                Framework = framework.Trim(),
+                Query = query.Trim(),
             };
 
-            return await _searchService.SearchAsync(request, cancellationToken);
+            return await searchService.SearchAsync(request, cancellationToken);
         }
 
+        [HttpGet("autocomplete")]
         public async Task<ActionResult<AutocompleteResponse>> AutocompleteAsync(
-            [FromQuery(Name = "q")] string autocompleteQuery = null,
-            [FromQuery(Name = "id")] string versionsQuery = null,
+            [FromQuery(Name = "q")] string autocompleteQuery = "",
+            [FromQuery(Name = "id")] string versionsQuery = "",
             [FromQuery]bool prerelease = false,
-            [FromQuery]string semVerLevel = null,
+            [FromQuery]string semVerLevel = "",
             [FromQuery]int skip = 0,
             [FromQuery]int take = 20,
 
             // These are unofficial parameters
-            [FromQuery]string packageType = null,
+            [FromQuery]string packageType = "",
             CancellationToken cancellationToken = default)
         {
+            var autocompleteQueryTrimmed = autocompleteQuery.Trim();
+            var versionsQueryTrimmed = versionsQuery.Trim();
+            var semVerLevelTrimmed = semVerLevel.Trim();
             // If only "id" is provided, find package versions. Otherwise, find package IDs.
-            if (versionsQuery != null && autocompleteQuery == null)
+            if (!string.IsNullOrEmpty(versionsQuery) && string.IsNullOrEmpty(autocompleteQueryTrimmed))
             {
                 var request = new VersionsRequest
                 {
                     IncludePrerelease = prerelease,
-                    IncludeSemVer2 = semVerLevel == "2.0.0",
-                    PackageId = versionsQuery,
+                    IncludeSemVer2 = semVerLevelTrimmed == "2.0.0",
+                    PackageId = versionsQueryTrimmed,
                 };
 
-                return await _searchService.ListPackageVersionsAsync(request, cancellationToken);
+                return await searchService.ListPackageVersionsAsync(request, cancellationToken);
             }
             else
             {
                 var request = new AutocompleteRequest
                 {
                     IncludePrerelease = prerelease,
-                    IncludeSemVer2 = semVerLevel == "2.0.0",
+                    IncludeSemVer2 = semVerLevelTrimmed == "2.0.0",
                     PackageType = packageType,
                     Skip = skip,
                     Take = take,
-                    Query = autocompleteQuery,
+                    Query = autocompleteQueryTrimmed,
                 };
 
-                return await _searchService.AutocompleteAsync(request, cancellationToken);
+                return await searchService.AutocompleteAsync(request, cancellationToken);
             }
         }
 
+        [HttpGet("dependents")]
         public async Task<ActionResult<DependentsResponse>> DependentsAsync(
-            [FromQuery] string packageId = null,
+            [FromQuery] string packageId = "",
             CancellationToken cancellationToken = default)
         {
-            if (string.IsNullOrWhiteSpace(packageId))
+            var trimmedPackageId = packageId.Trim();
+            if (string.IsNullOrEmpty(trimmedPackageId.Trim()))
             {
                 return BadRequest();
             }
 
-            return await _searchService.FindDependentsAsync(packageId, cancellationToken);
+            return await searchService.FindDependentsAsync(trimmedPackageId, cancellationToken);
         }
     }
 }

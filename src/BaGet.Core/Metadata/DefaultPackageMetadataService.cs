@@ -1,54 +1,45 @@
-using System;
+using BaGet.Protocol.Models;
+using NuGet.Versioning;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using BaGet.Protocol.Models;
-using NuGet.Versioning;
 
-namespace BaGet.Core
+namespace BaGet.Core.Metadata
 {
     /// <inheritdoc />
-    public class DefaultPackageMetadataService : IPackageMetadataService
+    public class DefaultPackageMetadataService(
+        IPackageService packages,
+        RegistrationBuilder builder)
+        : IPackageMetadataService
     {
-        private readonly IPackageService _packages;
-        private readonly RegistrationBuilder _builder;
-
-        public DefaultPackageMetadataService(
-            IPackageService packages,
-            RegistrationBuilder builder)
-        {
-            _packages = packages ?? throw new ArgumentNullException(nameof(packages));
-            _builder = builder ?? throw new ArgumentNullException(nameof(builder));
-        }
-
-        public async Task<BaGetRegistrationIndexResponse> GetRegistrationIndexOrNullAsync(
+        public async Task<BaGetRegistrationIndexResponse?> GetRegistrationIndexOrNullAsync(
             string packageId,
             CancellationToken cancellationToken = default)
         {
-            var packages = await _packages.FindPackagesAsync(packageId, cancellationToken);
-            if (!packages.Any())
+            var packages1 = await packages.FindPackagesAsync(packageId, cancellationToken);
+            if (!packages1.Any())
             {
                 return null;
             }
 
-            return _builder.BuildIndex(
+            return builder.BuildIndex(
                 new PackageRegistration(
                     packageId,
-                    packages));
+                    packages1));
         }
 
-        public async Task<RegistrationLeafResponse> GetRegistrationLeafOrNullAsync(
+        public async Task<RegistrationLeafResponse?> GetRegistrationLeafOrNullAsync(
             string id,
             NuGetVersion version,
             CancellationToken cancellationToken = default)
         {
-            var package = await _packages.FindPackageOrNullAsync(id, version, cancellationToken);
-            if (package == null)
+            var package = await packages.FindPackageOrNullAsync(id, version, cancellationToken);
+            if (package is null)
             {
                 return null;
             }
 
-            return _builder.BuildLeaf(package);
+            return builder.BuildLeaf(package);
         }
     }
 }

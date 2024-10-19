@@ -1,6 +1,8 @@
-﻿using System.Threading;
+using System.Threading;
 using System.Threading.Tasks;
 using BaGet.Core;
+using BaGet.Core.Search;
+using BaGet.Pages;
 using BaGet.Protocol.Models;
 using Moq;
 using Xunit;
