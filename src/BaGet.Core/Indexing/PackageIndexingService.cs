@@ -1,12 +1,15 @@
-using System;
-using System.IO;
-using System.Threading;
-using System.Threading.Tasks;
 using BaGet.Core.Configuration;
 using BaGet.Core.Entities;
+using BaGet.Core.Storage;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NuGet.Packaging;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Threading;
+using System.Threading.Tasks;
+using Xanadu.Skidbladnir.IO.File.Cache;
 
 namespace BaGet.Core.Indexing
 {
@@ -14,52 +17,75 @@ namespace BaGet.Core.Indexing
         IPackageDatabase packages,
         IPackageStorageService storage,
         IOptions<BaGetOptions> options,
+        IFileCachePool fileCachePool,
         ILogger<PackageIndexingService> logger)
         : IPackageIndexingService
     {
         public async Task<PackageIndexingResult> IndexAsync(Stream packageStream, CancellationToken cancellationToken)
         {
             // Try to extract all the necessary information from the package.
-            Package package;
-            Stream nuspecStream;
-            Stream readmeStream;
-            Stream iconStream;
+            var nuspecFile = fileCachePool.Register();
+            var readmeFile = fileCachePool.Register();
+            var iconFile = fileCachePool.Register();
 
+            Package package;
+            
             try
             {
-                using (var packageReader = new PackageArchiveReader(packageStream, leaveStreamOpen: true))
+                var packageReader = new PackageArchiveReader(packageStream, leaveStreamOpen: true);
+                package = packageReader.GetPackageMetadata();
+                package.Published = DateTime.Now;
+
+                var receivedTasks = new List<Task>
                 {
-                    package = packageReader.GetPackageMetadata();
-                    package.Published = DateTime.UtcNow;
+                    Task.Run(async () =>
+                    {
+                        await using var nuspecFileStream =
+                            new BufferedStream(new FileStream(nuspecFile.FullPath, FileMode.Create, FileAccess.Write));
+                        await using var nuspecStream = await packageReader.GetNuspecAsync(cancellationToken);
+                        await nuspecStream.CopyToAsync(nuspecFileStream, cancellationToken);
 
-                    nuspecStream = await packageReader.GetNuspecAsync(cancellationToken);
-                    nuspecStream = await nuspecStream.AsTemporaryFileStreamAsync(cancellationToken);
+                    }, cancellationToken)
+                };
 
-                    if (package.HasReadme)
+                if (package.HasReadme)
+                {
+                    receivedTasks.Add(Task.Run(async () =>
                     {
-                        readmeStream = await packageReader.GetReadmeAsync(cancellationToken);
-                        readmeStream = await readmeStream.AsTemporaryFileStreamAsync(cancellationToken);
-                    }
-                    else
-                    {
-                        readmeStream = null;
-                    }
+                        await using var readmeFileStream =
+                            new BufferedStream(new FileStream(readmeFile.FullPath, FileMode.Create, FileAccess.Write));
+                        await using var nuspecFileStream =
+                            new BufferedStream(new FileStream(nuspecFile.FullPath, FileMode.Create, FileAccess.Write));
+                        await using var readmeStream = await packageReader.GetReadmeAsync(cancellationToken);
+                        receivedTasks.Add(readmeStream.CopyToAsync(readmeFileStream, cancellationToken));
 
-                    if (package.HasEmbeddedIcon)
-                    {
-                        iconStream = await packageReader.GetIconAsync(cancellationToken);
-                        iconStream = await iconStream.AsTemporaryFileStreamAsync(cancellationToken);
-                    }
-                    else
-                    {
-                        iconStream = null;
-                    }
+                    }, cancellationToken));
+                    
                 }
+
+                if (package.HasEmbeddedIcon)
+                {
+                    receivedTasks.Add(Task.Run(async () =>
+                    {
+                        await using var iconFileStream =
+                            new BufferedStream(new FileStream(iconFile.FullPath, FileMode.Create, FileAccess.Write));
+                        await using var nuspecFileStream =
+                            new BufferedStream(new FileStream(nuspecFile.FullPath, FileMode.Create, FileAccess.Write));
+                        await using var iconStream = await packageReader.GetIconAsync(cancellationToken);
+                        receivedTasks.Add(iconStream.CopyToAsync(iconFileStream, cancellationToken));
+
+                    }, cancellationToken));
+                    
+                }
+
+                Task.WaitAll(receivedTasks.ToArray(), cancellationToken);
             }
             catch (Exception e)
             {
                 logger.LogError(e, "Uploaded package is invalid");
-
+                fileCachePool.UnRegister(nuspecFile);
+                fileCachePool.UnRegister(readmeFile);
+                fileCachePool.UnRegister(iconFile);
                 return PackageIndexingResult.InvalidPackage;
             }
 
@@ -68,6 +94,9 @@ namespace BaGet.Core.Indexing
             {
                 if (!options.Value.AllowPackageOverwrites)
                 {
+                    fileCachePool.UnRegister(nuspecFile);
+                    fileCachePool.UnRegister(readmeFile);
+                    fileCachePool.UnRegister(iconFile);
                     return PackageIndexingResult.PackageAlreadyExists;
                 }
 
@@ -89,9 +118,9 @@ namespace BaGet.Core.Indexing
                 await storage.SavePackageContentAsync(
                     package,
                     packageStream,
-                    nuspecStream,
-                    readmeStream,
-                    iconStream,
+                    nuspecFile,
+                    readmeFile,
+                    iconFile,
                     cancellationToken);
             }
             catch (Exception e)
@@ -106,6 +135,12 @@ namespace BaGet.Core.Indexing
                     package.NormalizedVersionString);
 
                 throw;
+            }
+            finally
+            {
+                fileCachePool.UnRegister(nuspecFile);
+                fileCachePool.UnRegister(readmeFile);
+                fileCachePool.UnRegister(iconFile);
             }
 
             logger.LogInformation(

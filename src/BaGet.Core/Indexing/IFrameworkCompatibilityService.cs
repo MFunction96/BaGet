@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace BaGet.Core
+namespace BaGet.Core.Indexing
 {
     /// <summary>
     /// Used to determine the compatibility matrix between frameworks.

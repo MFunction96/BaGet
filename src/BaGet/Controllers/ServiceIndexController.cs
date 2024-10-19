@@ -14,7 +14,7 @@ namespace BaGet.Controllers
     public class ServiceIndexController(IServiceIndexService serviceIndex) : ControllerBase
     {
         // GET v3/index
-        [HttpGet("index.json")]
+        [HttpGet("index.json", Name = Routes.IndexRouteName)]
         public async Task<ServiceIndexResponse> GetAsync(CancellationToken cancellationToken)
         {
             return await serviceIndex.GetAsync(cancellationToken);

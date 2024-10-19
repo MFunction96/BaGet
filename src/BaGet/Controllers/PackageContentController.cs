@@ -15,7 +15,7 @@ namespace BaGet.Controllers
     [Route("v3/package")]
     public class PackageContentController(IPackageContentService content) : ControllerBase
     {
-        [HttpGet("{id}/index.json")]
+        [HttpGet("{id}/index.json", Name = Routes.PackageVersionsRouteName)]
         public async Task<ActionResult<PackageVersionsResponse>> GetPackageVersionsAsync(string id, CancellationToken cancellationToken)
         {
             var versions = await content.GetPackageVersionsOrNullAsync(id, cancellationToken);
@@ -27,7 +27,7 @@ namespace BaGet.Controllers
             return versions;
         }
 
-        [HttpGet("{id}/{version}/{idVersion}.nupkg")]
+        [HttpGet("{id}/{version}/{idVersion}.nupkg", Name = Routes.PackageDownloadRouteName)]
         public async Task<IActionResult> DownloadPackageAsync(string id, string version, CancellationToken cancellationToken)
         {
             if (!NuGetVersion.TryParse(version, out var nugetVersion))
@@ -44,7 +44,7 @@ namespace BaGet.Controllers
             return File(packageStream, "application/octet-stream");
         }
 
-        [HttpGet("{id}/{version}/{id2}.nuspec")]
+        [HttpGet("{id}/{version}/{id2}.nuspec", Name = Routes.PackageDownloadManifestRouteName)]
         public async Task<IActionResult> DownloadNuspecAsync(string id, string version, CancellationToken cancellationToken)
         {
             if (!NuGetVersion.TryParse(version, out var nugetVersion))
@@ -61,7 +61,7 @@ namespace BaGet.Controllers
             return File(nuspecStream, "text/xml");
         }
 
-        [HttpGet("{id}/{version}/readme")]
+        [HttpGet("{id}/{version}/readme", Name = Routes.PackageDownloadReadmeRouteName)]
         public async Task<IActionResult> DownloadReadmeAsync(string id, string version, CancellationToken cancellationToken)
         {
             if (!NuGetVersion.TryParse(version, out var nugetVersion))
@@ -78,7 +78,7 @@ namespace BaGet.Controllers
             return File(readmeStream, "text/markdown");
         }
 
-        [HttpGet("{id}/{version}/icon")]
+        [HttpGet("{id}/{version}/icon", Name = Routes.PackageDownloadIconRouteName)]
         public async Task<IActionResult> DownloadIconAsync(string id, string version, CancellationToken cancellationToken)
         {
             if (!NuGetVersion.TryParse(version, out var nugetVersion))

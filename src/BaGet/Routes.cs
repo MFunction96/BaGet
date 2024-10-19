@@ -1,6 +1,6 @@
 namespace BaGet
 {
-    public class Routes
+    public static class Routes
     {
         public const string IndexRouteName = "index";
         public const string UploadPackageRouteName = "upload-package";

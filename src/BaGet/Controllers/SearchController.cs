@@ -1,9 +1,9 @@
 using BaGet.Core;
+using BaGet.Core.Search;
 using BaGet.Protocol.Models;
 using Microsoft.AspNetCore.Mvc;
 using System.Threading;
 using System.Threading.Tasks;
-using BaGet.Core.Search;
 
 namespace BaGet.Controllers
 {
@@ -11,7 +11,7 @@ namespace BaGet.Controllers
     [Route("v3")]
     public class SearchController(ISearchService searchService) : ControllerBase
     {
-        [HttpGet("search")]
+        [HttpGet("search", Name = Routes.SearchRouteName)]
         public async Task<ActionResult<SearchResponse>> SearchAsync(
             [FromQuery(Name = "q")] string query = "",
             [FromQuery]int skip = 0,
@@ -38,7 +38,7 @@ namespace BaGet.Controllers
             return await searchService.SearchAsync(request, cancellationToken);
         }
 
-        [HttpGet("autocomplete")]
+        [HttpGet("autocomplete", Name = Routes.AutocompleteRouteName)]
         public async Task<ActionResult<AutocompleteResponse>> AutocompleteAsync(
             [FromQuery(Name = "q")] string autocompleteQuery = "",
             [FromQuery(Name = "id")] string versionsQuery = "",
@@ -82,7 +82,7 @@ namespace BaGet.Controllers
             }
         }
 
-        [HttpGet("dependents")]
+        [HttpGet("dependents", Name = Routes.DependentsRouteName)]
         public async Task<ActionResult<DependentsResponse>> DependentsAsync(
             [FromQuery] string packageId = "",
             CancellationToken cancellationToken = default)

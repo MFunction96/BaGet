@@ -4,15 +4,15 @@ using System.Collections.Generic;
 using System.Linq;
 using NuGet.Frameworks;
 
-namespace BaGet.Core
+namespace BaGet.Core.Indexing
 {
-    using static NuGet.Frameworks.FrameworkConstants;
+    using static FrameworkConstants;
 
     public class FrameworkCompatibilityService : IFrameworkCompatibilityService
     {
         private const string AnyFramework = "any";
 
-        private static readonly Dictionary<string, NuGetFramework> KnownFrameworks;
+        private static readonly Dictionary<string, NuGetFramework?> KnownFrameworks;
         private static readonly IReadOnlyList<OneWayCompatibilityMappingEntry> CompatibilityMapping;
         private static readonly ConcurrentDictionary<NuGetFramework, IReadOnlyList<string>> CompatibleFrameworks;
 

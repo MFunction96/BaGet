@@ -1,13 +1,15 @@
+using BaGet.Core.Entities;
+using BaGet.Core.Storage;
+using Microsoft.Extensions.Logging;
+using Moq;
+using NuGet.Versioning;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading;
 using System.Threading.Tasks;
-using BaGet.Core.Entities;
-using Microsoft.Extensions.Logging;
-using Moq;
-using NuGet.Versioning;
+using Xanadu.Skidbladnir.IO.File.Cache;
 using Xunit;
 
 namespace BaGet.Core.Tests.Services
@@ -17,77 +19,41 @@ namespace BaGet.Core.Tests.Services
         public class SavePackageContentAsync : FactsBase
         {
             [Fact]
-            public async Task ThrowsIfPackageIsNull()
-            {
-                await Assert.ThrowsAsync<ArgumentNullException>(
-                    () => _target.SavePackageContentAsync(
-                        null,
-                        packageStream: Stream.Null,
-                        nuspecStream: Stream.Null,
-                        readmeStream: Stream.Null,
-                        iconStream: Stream.Null));
-            }
-
-            [Fact]
-            public async Task ThrowsIfPackageStreamIsNull()
-            {
-                await Assert.ThrowsAsync<ArgumentNullException>(
-                    () => _target.SavePackageContentAsync(
-                        _package,
-                        packageStream: null,
-                        nuspecStream: Stream.Null,
-                        readmeStream: Stream.Null,
-                        iconStream: Stream.Null));
-            }
-
-            [Fact]
-            public async Task ThrowsIfNuspecStreamIsNull()
-            {
-                await Assert.ThrowsAsync<ArgumentNullException>(
-                    () => _target.SavePackageContentAsync(
-                        _package,
-                        packageStream: Stream.Null,
-                        nuspecStream: null,
-                        readmeStream: Stream.Null,
-                        iconStream: Stream.Null));
-            }
-
-            [Fact]
             public async Task SavesContent()
             {
                 // Arrange
                 SetupPutResult(StoragePutResult.Success);
+                using var nuspecCacheFile = _fileCachePool.Register();
+                await File.WriteAllTextAsync(nuspecCacheFile.FullPath, "My nuspec");
+                using var readmeCacheFile = _fileCachePool.Register();
+                await File.WriteAllTextAsync(readmeCacheFile.FullPath, "My readme");
+                using var iconCacheFile = _fileCachePool.Register();
+                await File.WriteAllTextAsync(iconCacheFile.FullPath, "My icon");
+                await using var packageStream = StringStream("My package");
+                // Act
+                await _target.SavePackageContentAsync(
+                    _package,
+                    packageStream: packageStream,
+                    nuspecCacheFile: nuspecCacheFile,
+                    readmeCacheFile: readmeCacheFile,
+                    iconCacheFile: iconCacheFile);
 
-                using (var packageStream = StringStream("My package"))
-                using (var nuspecStream = StringStream("My nuspec"))
-                using (var readmeStream = StringStream("My readme"))
-                using (var iconStream = StringStream("My icon"))
-                {
-                    // Act
-                    await _target.SavePackageContentAsync(
-                        _package,
-                        packageStream: packageStream,
-                        nuspecStream: nuspecStream,
-                        readmeStream: readmeStream,
-                        iconStream: iconStream);
+                // Assert
+                Assert.True(_puts.ContainsKey(PackagePath));
+                Assert.Equal("My package", _puts[PackagePath].Content);
+                Assert.Equal("binary/octet-stream", _puts[PackagePath].ContentType);
 
-                    // Assert
-                    Assert.True(_puts.ContainsKey(PackagePath));
-                    Assert.Equal("My package", await ToStringAsync(_puts[PackagePath].Content));
-                    Assert.Equal("binary/octet-stream", _puts[PackagePath].ContentType);
+                Assert.True(_puts.ContainsKey(NuspecPath));
+                Assert.Equal("My nuspec", _puts[NuspecPath].Content);
+                Assert.Equal("text/plain", _puts[NuspecPath].ContentType);
 
-                    Assert.True(_puts.ContainsKey(NuspecPath));
-                    Assert.Equal("My nuspec", await ToStringAsync(_puts[NuspecPath].Content));
-                    Assert.Equal("text/plain", _puts[NuspecPath].ContentType);
+                Assert.True(_puts.ContainsKey(ReadmePath));
+                Assert.Equal("My readme", _puts[ReadmePath].Content);
+                Assert.Equal("text/markdown", _puts[ReadmePath].ContentType);
 
-                    Assert.True(_puts.ContainsKey(ReadmePath));
-                    Assert.Equal("My readme", await ToStringAsync(_puts[ReadmePath].Content));
-                    Assert.Equal("text/markdown", _puts[ReadmePath].ContentType);
-
-                    Assert.True(_puts.ContainsKey(IconPath));
-                    Assert.Equal("My icon", await ToStringAsync(_puts[IconPath].Content));
-                    Assert.Equal("image/xyz", _puts[IconPath].ContentType);
-                }
+                Assert.True(_puts.ContainsKey(IconPath));
+                Assert.Equal("My icon", _puts[IconPath].Content);
+                Assert.Equal("image/xyz", _puts[IconPath].ContentType);
             }
 
             [Fact]
@@ -95,17 +61,17 @@ namespace BaGet.Core.Tests.Services
             {
                 // Arrange
                 SetupPutResult(StoragePutResult.Success);
-
+                using var nuspecCacheFile = _fileCachePool.Register();
+                await File.WriteAllTextAsync(nuspecCacheFile.FullPath, "My nuspec");
                 using (var packageStream = StringStream("My package"))
-                using (var nuspecStream = StringStream("My nuspec"))
                 {
                     // Act
                     await _target.SavePackageContentAsync(
                         _package,
                         packageStream: packageStream,
-                        nuspecStream: nuspecStream,
-                        readmeStream: null,
-                        iconStream: null);
+                        nuspecCacheFile: nuspecCacheFile,
+                        readmeCacheFile: null,
+                        iconCacheFile: null);
                 }
 
                 // Assert
@@ -117,20 +83,22 @@ namespace BaGet.Core.Tests.Services
             {
                 // Arrange
                 SetupPutResult(StoragePutResult.Success);
-
+                using var nuspecCacheFile = _fileCachePool.Register();
+                await File.WriteAllTextAsync(nuspecCacheFile.FullPath, "My nuspec");
+                using var readmeCacheFile = _fileCachePool.Register();
+                await File.WriteAllTextAsync(readmeCacheFile.FullPath, "My readme");
+                using var iconCacheFile = _fileCachePool.Register();
+                await File.WriteAllTextAsync(iconCacheFile.FullPath, "My icon");
                 _package.Version = new NuGetVersion("1.2.3.0");
                 using (var packageStream = StringStream("My package"))
-                using (var nuspecStream = StringStream("My nuspec"))
-                using (var readmeStream = StringStream("My readme"))
-                using (var iconStream = StringStream("My icon"))
                 {
                     // Act
                     await _target.SavePackageContentAsync(
                         _package,
                         packageStream: packageStream,
-                        nuspecStream: nuspecStream,
-                        readmeStream: readmeStream,
-                        iconStream: iconStream);
+                        nuspecCacheFile: nuspecCacheFile,
+                        readmeCacheFile: readmeCacheFile,
+                        iconCacheFile: iconCacheFile);
                 }
 
                 // Assert
@@ -144,36 +112,36 @@ namespace BaGet.Core.Tests.Services
             {
                 // Arrange
                 SetupPutResult(StoragePutResult.AlreadyExists);
+                using var nuspecCacheFile = _fileCachePool.Register();
+                await File.WriteAllTextAsync(nuspecCacheFile.FullPath, "My nuspec");
+                using var readmeCacheFile = _fileCachePool.Register();
+                await File.WriteAllTextAsync(readmeCacheFile.FullPath, "My readme");
+                using var iconCacheFile = _fileCachePool.Register();
+                await File.WriteAllTextAsync(iconCacheFile.FullPath, "My icon");
+                await using var packageStream = StringStream("My package");
+                await _target.SavePackageContentAsync(
+                    _package,
+                    packageStream: packageStream,
+                    nuspecCacheFile: nuspecCacheFile,
+                    readmeCacheFile: readmeCacheFile,
+                    iconCacheFile: iconCacheFile);
 
-                using (var packageStream = StringStream("My package"))
-                using (var nuspecStream = StringStream("My nuspec"))
-                using (var readmeStream = StringStream("My readme"))
-                using (var iconStream = StringStream("My icon"))
-                {
-                    await _target.SavePackageContentAsync(
-                        _package,
-                        packageStream: packageStream,
-                        nuspecStream: nuspecStream,
-                        readmeStream: readmeStream,
-                        iconStream: iconStream);
+                // Assert
+                Assert.True(_puts.ContainsKey(PackagePath));
+                Assert.Equal("My package", _puts[PackagePath].Content);
+                Assert.Equal("binary/octet-stream", _puts[PackagePath].ContentType);
 
-                    // Assert
-                    Assert.True(_puts.ContainsKey(PackagePath));
-                    Assert.Equal("My package", await ToStringAsync(_puts[PackagePath].Content));
-                    Assert.Equal("binary/octet-stream", _puts[PackagePath].ContentType);
+                Assert.True(_puts.ContainsKey(NuspecPath));
+                Assert.Equal("My nuspec", _puts[NuspecPath].Content);
+                Assert.Equal("text/plain", _puts[NuspecPath].ContentType);
 
-                    Assert.True(_puts.ContainsKey(NuspecPath));
-                    Assert.Equal("My nuspec", await ToStringAsync(_puts[NuspecPath].Content));
-                    Assert.Equal("text/plain", _puts[NuspecPath].ContentType);
+                Assert.True(_puts.ContainsKey(ReadmePath));
+                Assert.Equal("My readme", _puts[ReadmePath].Content);
+                Assert.Equal("text/markdown", _puts[ReadmePath].ContentType);
 
-                    Assert.True(_puts.ContainsKey(ReadmePath));
-                    Assert.Equal("My readme", await ToStringAsync(_puts[ReadmePath].Content));
-                    Assert.Equal("text/markdown", _puts[ReadmePath].ContentType);
-
-                    Assert.True(_puts.ContainsKey(IconPath));
-                    Assert.Equal("My icon", await ToStringAsync(_puts[IconPath].Content));
-                    Assert.Equal("image/xyz", _puts[IconPath].ContentType);
-                }
+                Assert.True(_puts.ContainsKey(IconPath));
+                Assert.Equal("My icon", _puts[IconPath].Content);
+                Assert.Equal("image/xyz", _puts[IconPath].ContentType);
             }
 
             [Fact]
@@ -181,20 +149,22 @@ namespace BaGet.Core.Tests.Services
             {
                 // Arrange
                 SetupPutResult(StoragePutResult.Conflict);
-
+                using var nuspecCacheFile = _fileCachePool.Register();
+                await File.WriteAllTextAsync(nuspecCacheFile.FullPath, "My nuspec");
+                using var readmeCacheFile = _fileCachePool.Register();
+                await File.WriteAllTextAsync(readmeCacheFile.FullPath, "My readme");
+                using var iconCacheFile = _fileCachePool.Register();
+                await File.WriteAllTextAsync(iconCacheFile.FullPath, "My icon");
                 using (var packageStream = StringStream("My package"))
-                using (var nuspecStream = StringStream("My nuspec"))
-                using (var readmeStream = StringStream("My readme"))
-                using (var iconStream = StringStream("My icon"))
                 {
                     // Act
                     await Assert.ThrowsAsync<InvalidOperationException>(() =>
                         _target.SavePackageContentAsync(
                             _package,
                             packageStream: packageStream,
-                            nuspecStream: nuspecStream,
-                            readmeStream: readmeStream,
-                            iconStream: iconStream));
+                            nuspecCacheFile: nuspecCacheFile,
+                            readmeCacheFile: readmeCacheFile,
+                            iconCacheFile: iconCacheFile));
                 }
             }
         }
@@ -237,7 +207,7 @@ namespace BaGet.Core.Tests.Services
             }
         }
 
-        public class GetNuspecStreamAsync : FactsBase
+        public class GetnuspecCacheFileAsync : FactsBase
         {
             [Fact]
             public async Task ThrowsIfDoesntExist()
@@ -258,11 +228,11 @@ namespace BaGet.Core.Tests.Services
             {
                 // Arrange
                 var cancellationToken = CancellationToken.None;
-                using (var nuspecStream = StringStream("My nuspec"))
+                using (var nuspecCacheFile = StringStream("My nuspec"))
                 {
                     _storage
                         .Setup(s => s.GetAsync(NuspecPath, cancellationToken))
-                        .ReturnsAsync(nuspecStream);
+                        .ReturnsAsync(nuspecCacheFile);
 
                     // Act
                     var result = await _target.GetNuspecStreamAsync(_package.Id, _package.Version, cancellationToken);
@@ -275,7 +245,7 @@ namespace BaGet.Core.Tests.Services
             }
         }
 
-        public class GetReadmeStreamAsync : FactsBase
+        public class GetreadmeCacheFileAsync : FactsBase
         {
             [Fact]
             public async Task ThrowsIfDoesntExist()
@@ -296,11 +266,11 @@ namespace BaGet.Core.Tests.Services
             {
                 // Arrange
                 var cancellationToken = CancellationToken.None;
-                using (var readmeStream = StringStream("My readme"))
+                using (var readmeCacheFile = StringStream("My readme"))
                 {
                     _storage
                         .Setup(s => s.GetAsync(ReadmePath, cancellationToken))
-                        .ReturnsAsync(readmeStream);
+                        .ReturnsAsync(readmeCacheFile);
 
                     // Act
                     var result = await _target.GetReadmeStreamAsync(_package.Id, _package.Version, cancellationToken);
@@ -336,17 +306,20 @@ namespace BaGet.Core.Tests.Services
                 Version = new NuGetVersion("1.2.3")
             };
 
+            protected readonly IFileCachePool _fileCachePool;
             protected readonly Mock<IStorageService> _storage;
             protected readonly PackageStorageService _target;
+            protected readonly Mock<ILogger<FileCachePool>> _logger;
 
-            protected readonly Dictionary<string, (Stream Content, string ContentType)> _puts;
+            protected readonly Dictionary<string, (string Content, string ContentType)> _puts;
 
             public FactsBase()
             {
                 _storage = new Mock<IStorageService>();
+                _logger = new Mock<ILogger<FileCachePool>>();
                 _target = new PackageStorageService(_storage.Object, Mock.Of<ILogger<PackageStorageService>>());
-
-                _puts = new Dictionary<string, (Stream Content, string ContentType)>();
+                _fileCachePool = new FileCachePool(_logger.Object);
+                _puts = new Dictionary<string, (string Content, string ContentType)>();
             }
 
             protected string PackagePath => Path.Combine("packages", "my.package", "1.2.3", "my.package.1.2.3.nupkg");
@@ -356,7 +329,7 @@ namespace BaGet.Core.Tests.Services
 
             protected Stream StringStream(string input)
             {
-                var bytes = Encoding.ASCII.GetBytes(input);
+                var bytes = Encoding.UTF8.GetBytes(input);
 
                 return new MemoryStream(bytes);
             }
@@ -380,7 +353,8 @@ namespace BaGet.Core.Tests.Services
                             It.IsAny<CancellationToken>()))
                     .Callback((string path, Stream content, string contentType, CancellationToken cancellationToken) =>
                     {
-                        _puts[path] = (content, contentType);
+                        using var reader = new StreamReader(content);
+                        _puts[path] = (reader.ReadToEnd(), contentType);
                     })
                     .ReturnsAsync(result);
             }

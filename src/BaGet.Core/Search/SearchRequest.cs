@@ -1,4 +1,4 @@
-namespace BaGet.Core
+namespace BaGet.Core.Search
 {
     /// <summary>
     /// The NuGet V3 search request.
@@ -29,16 +29,16 @@ namespace BaGet.Core
         /// <summary>
         /// Filter results to a package type. If null, no filter is applied.
         /// </summary>
-        public string PackageType { get; set; }
+        public string? PackageType { get; set; }
 
         /// <summary>
         /// Filters results to a target framework. If null, no filter is applied.
         /// </summary>
-        public string Framework { get; set; }
+        public string? Framework { get; set; }
 
         /// <summary>
         /// The search query.
         /// </summary>
-        public string Query { get; set; }
+        public string? Query { get; set; }
     }
 }

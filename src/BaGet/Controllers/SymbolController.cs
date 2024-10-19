@@ -7,6 +7,7 @@ using Microsoft.Extensions.Options;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Xanadu.Skidbladnir.IO.File.Cache;
 
 namespace BaGet.Controllers
 {
@@ -17,11 +18,12 @@ namespace BaGet.Controllers
         ISymbolIndexingService indexer,
         ISymbolStorageService storage,
         IOptions<BaGetOptions> options,
+        IFileCachePool fileCachePool,
         ILogger<SymbolController> logger)
         : ControllerBase
     {
         // See: https://docs.microsoft.com/en-us/nuget/api/package-publish-resource#push-a-package
-        [HttpPut("v2/symbol")]
+        [HttpPut("v2/symbol", Name = Routes.UploadSymbolRouteName)]
         public async Task Upload(CancellationToken cancellationToken)
         {
             if (options.Value.IsReadOnlyMode || !await authentication.AuthenticateAsync(Request.GetApiKey(), cancellationToken))
@@ -32,7 +34,8 @@ namespace BaGet.Controllers
 
             try
             {
-                await using var uploadStream = await Request.GetUploadStreamOrNullAsync(cancellationToken);
+                using var uploadFile = fileCachePool.Register();
+                await using var uploadStream = await Request.GetUploadStreamOrNullAsync(uploadFile, cancellationToken);
                 var result = await indexer.IndexAsync(uploadStream, cancellationToken);
 
                 HttpContext.Response.StatusCode = result switch
@@ -51,7 +54,7 @@ namespace BaGet.Controllers
             }
         }
 
-        [HttpGet("download/symbols/{file}/{key}")]
+        [HttpGet("download/symbols/{file}/{key}", Name = Routes.SymbolDownloadRouteName)]
         public async Task<IActionResult> Get(string file, string key)
         {
             var pdbStream = await storage.GetPortablePdbContentStreamOrNullAsync(file, key);
@@ -59,7 +62,7 @@ namespace BaGet.Controllers
             return File(pdbStream, "application/octet-stream");
         }
 
-        [HttpGet("download/symbols/{prefix}/{file}/{key}/{file2}")]
+        [HttpGet("download/symbols/{prefix}/{file}/{key}/{file2}", Name = Routes.PrefixedSymbolDownloadRouteName)]
         public Task<IActionResult> Get(string prefix, string file, string key, string file2)
         {
             throw new NotImplementedException();

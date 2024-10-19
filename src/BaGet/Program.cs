@@ -6,6 +6,7 @@ using BaGet.Core.Entities;
 using BaGet.Core.Indexing;
 using BaGet.Core.Metadata;
 using BaGet.Core.Search;
+using BaGet.Core.Storage;
 using BaGet.Core.Upstream;
 using Microsoft.AspNetCore.Builder;
 using Microsoft.AspNetCore.HttpOverrides;
@@ -17,6 +18,7 @@ using Microsoft.Extensions.Options;
 using Serilog;
 using System;
 using System.Text;
+using Xanadu.Skidbladnir.IO.File.Cache;
 
 namespace BaGet
 {
@@ -74,6 +76,9 @@ namespace BaGet
                 applicationBuilder.Services.AddEndpointsApiExplorer();
                 applicationBuilder.Services.AddSwaggerGen();
                 applicationBuilder.Services.AddHttpContextAccessor();
+
+                // Add Xanadu services.
+                applicationBuilder.Services.AddSingleton<IFileCachePool, FileCachePool>();
 
                 // Add BaGet services in ordered.
                 applicationBuilder.Services.AddScoped<IPackageDatabase, PackageDatabase>();

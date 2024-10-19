@@ -1,9 +1,3 @@
-using System;
-using System.Collections.Generic;
-using System.IO;
-using System.Linq;
-using System.Threading;
-using System.Threading.Tasks;
 using BaGet.Core;
 using BaGet.Core.Content;
 using BaGet.Core.Entities;
@@ -13,6 +7,12 @@ using Microsoft.AspNetCore.Html;
 using Microsoft.AspNetCore.Mvc.RazorPages;
 using NuGet.Frameworks;
 using NuGet.Versioning;
+using System;
+using System.Collections.Generic;
+using System.IO;
+using System.Linq;
+using System.Threading;
+using System.Threading.Tasks;
 
 namespace BaGet.Pages
 {
@@ -34,16 +34,16 @@ namespace BaGet.Pages
 
         public bool Found { get; private set; }
 
-        public Package Package { get; private set; }
+        public Package? Package { get; private set; }
 
         public bool IsDotnetTemplate { get; private set; }
         public bool IsDotnetTool { get; private set; }
         public DateTime LastUpdated { get; private set; }
         public long TotalDownloads { get; private set; }
 
-        public IReadOnlyList<PackageDependent> UsedBy { get; set; } = new List<PackageDependent>();
-        public IReadOnlyList<DependencyGroupModel> DependencyGroups { get; private set; } = new List<DependencyGroupModel>();
-        public IReadOnlyList<VersionModel> Versions { get; private set; } = new List<VersionModel>();
+        public IReadOnlyList<PackageDependent>? UsedBy { get; set; }
+        public IReadOnlyList<DependencyGroupModel>? DependencyGroups { get; private set; }
+        public IReadOnlyList<VersionModel>? Versions { get; private set; }
 
         public HtmlString Readme { get; private set; } = HtmlString.Empty;
 
@@ -63,10 +63,7 @@ namespace BaGet.Pages
             }
 
             // Otherwise try to display the latest version.
-            if (Package == null)
-            {
-                Package = listedPackages.OrderByDescending(p => p.Version).FirstOrDefault();
-            }
+            Package ??= listedPackages.OrderByDescending(p => p.Version).FirstOrDefault();
 
             if (Package == null)
             {
@@ -78,8 +75,8 @@ namespace BaGet.Pages
             var packageVersion = Package.Version;
 
             Found = true;
-            IsDotnetTemplate = Package.PackageTypes.Any(t => t.Name.Equals("Template", StringComparison.OrdinalIgnoreCase));
-            IsDotnetTool = Package.PackageTypes.Any(t => t.Name.Equals("DotnetTool", StringComparison.OrdinalIgnoreCase));
+            IsDotnetTemplate = Package.PackageTypes.Any(t => string.Compare(t.Name, "Template", StringComparison.OrdinalIgnoreCase) == 0);
+            IsDotnetTool = Package.PackageTypes.Any(t => string.Compare(t.Name, "DotnetTool", StringComparison.OrdinalIgnoreCase) == 0);
             LastUpdated = packages1.Max(p => p.Published);
             TotalDownloads = packages1.Sum(p => p.Downloads);
 
@@ -128,7 +125,7 @@ namespace BaGet.Pages
 
         private string PrettifyTargetFramework(string targetFramework)
         {
-            if (targetFramework == null) return "All Frameworks";
+            if (string.IsNullOrEmpty(targetFramework)) return "All Frameworks";
 
             NuGetFramework framework;
             try
@@ -170,9 +167,9 @@ namespace BaGet.Pages
             return $"{frameworkName} {frameworkVersion}";
         }
 
-        private IReadOnlyList<VersionModel> ToVersions(IReadOnlyList<Package> packages, NuGetVersion selectedVersion)
+        private IReadOnlyList<VersionModel> ToVersions(IReadOnlyList<Package> vPackages, NuGetVersion selectedVersion)
         {
-            return packages
+            return vPackages
                 .Select(p => new VersionModel
                 {
                     Version = p.Version,
@@ -196,7 +193,7 @@ namespace BaGet.Pages
 
                 using (var reader = new StreamReader(readmeStream))
                 {
-                    readme = await reader.ReadToEndAsync();
+                    readme = await reader.ReadToEndAsync(cancellationToken);
                 }
             }
 
@@ -207,14 +204,14 @@ namespace BaGet.Pages
         public class DependencyGroupModel
         {
             public string Name { get; set; }
-            public IReadOnlyList<DependencyModel> Dependencies { get; set; }
+            public IReadOnlyList<DependencyModel>? Dependencies { get; set; }
         }
 
         // TODO: Convert this to records.
         public class DependencyModel
         {
-            public string PackageId { get; set; }
-            public string VersionSpec { get; set; }
+            public string PackageId { get; set; } = string.Empty;
+            public string VersionSpec { get; set; } = string.Empty;
         }
 
         // TODO: Convert this to records.

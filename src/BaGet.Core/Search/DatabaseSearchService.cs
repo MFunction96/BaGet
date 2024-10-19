@@ -1,4 +1,5 @@
 using BaGet.Core.Entities;
+using BaGet.Core.Indexing;
 using BaGet.Protocol.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
@@ -11,7 +12,7 @@ namespace BaGet.Core.Search
 {
     public class DatabaseSearchService(
         BaGetDbContext context,
-        IFrameworkCompatibilityService frameworks,
+        IFrameworkCompatibilityService frameworksCompatibilityService,
         ISearchResponseBuilder searchBuilder)
         : ISearchService
     {
@@ -20,7 +21,11 @@ namespace BaGet.Core.Search
             var frameworks = GetCompatibleFrameworksOrNull(request.Framework);
 
             IQueryable<Package> search = context.Packages;
-            search = ApplySearchQuery(search, request.Query);
+            if (!string.IsNullOrEmpty(request.Query))
+            {
+                search = ApplySearchQuery(search, request.Query);
+            }
+
             search = ApplySearchFilters(
                 search,
                 request.IncludePrerelease,
@@ -153,8 +158,8 @@ namespace BaGet.Core.Search
             IQueryable<Package> query,
             bool includePrerelease,
             bool includeSemVer2,
-            string packageType,
-            IReadOnlyList<string> frameworks)
+            string? packageType,
+            IReadOnlyList<string>? frameworks)
         {
             if (!includePrerelease)
             {
@@ -171,7 +176,7 @@ namespace BaGet.Core.Search
                 query = query.Where(p => p.PackageTypes.Any(t => t.Name == packageType));
             }
 
-            if (frameworks != null)
+            if (frameworks is not null)
             {
                 query = query.Where(p => p.TargetFrameworks.Any(f => frameworks.Contains(f.Moniker)));
             }
@@ -179,11 +184,9 @@ namespace BaGet.Core.Search
             return query.Where(p => p.Listed);
         }
 
-        private IReadOnlyList<string> GetCompatibleFrameworksOrNull(string framework)
+        private IReadOnlyList<string>? GetCompatibleFrameworksOrNull(string? framework)
         {
-            if (framework == null) return null;
-
-            return frameworks.FindAllCompatibleFrameworks(framework);
+            return string.IsNullOrEmpty(framework) ? null : frameworksCompatibilityService.FindAllCompatibleFrameworks(framework);
         }
     }
 }

@@ -2,6 +2,7 @@ using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
 using BaGet.Core.Entities;
+using BaGet.Core.Storage;
 using NuGet.Versioning;
 
 namespace BaGet.Core
@@ -28,7 +29,7 @@ namespace BaGet.Core
         /// <param name="includeUnlisted">Whether unlisted results should be included.</param>
         /// <param name="cancellationToken">A token to cancel the task.</param>
         /// <returns>The package found, or null.</returns>
-        Task<Package> FindOrNullAsync(
+        Task<Package?> FindOrNullAsync(
             string id,
             NuGetVersion version,
             bool includeUnlisted,

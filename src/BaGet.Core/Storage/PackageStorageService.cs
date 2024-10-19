@@ -1,14 +1,18 @@
+using BaGet.Core.Entities;
+using Microsoft.Extensions.Logging;
+using NuGet.Versioning;
 using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using BaGet.Core.Entities;
-using Microsoft.Extensions.Logging;
-using NuGet.Versioning;
+using Xanadu.Skidbladnir.IO.File.Cache;
 
-namespace BaGet.Core
+namespace BaGet.Core.Storage
 {
-    public class PackageStorageService : IPackageStorageService
+    public class PackageStorageService(
+        IStorageService storage,
+        ILogger<PackageStorageService> logger)
+        : IPackageStorageService
     {
         private const string PackagesPathPrefix = "packages";
 
@@ -18,29 +22,14 @@ namespace BaGet.Core
         private const string ReadmeContentType = "text/markdown";
         private const string IconContentType = "image/xyz";
 
-        private readonly IStorageService _storage;
-        private readonly ILogger<PackageStorageService> _logger;
-
-        public PackageStorageService(
-            IStorageService storage,
-            ILogger<PackageStorageService> logger)
-        {
-            _storage = storage ?? throw new ArgumentNullException(nameof(storage));
-            _logger = logger ?? throw new ArgumentNullException(nameof(logger));
-        }
-
         public async Task SavePackageContentAsync(
             Package package,
             Stream packageStream,
-            Stream nuspecStream,
-            Stream readmeStream,
-            Stream iconStream,
+            FileCache nuspecCacheFile,
+            FileCache? readmeCacheFile,
+            FileCache? iconCacheFile,
             CancellationToken cancellationToken = default)
         {
-            package = package ?? throw new ArgumentNullException(nameof(package));
-            packageStream = packageStream ?? throw new ArgumentNullException(nameof(packageStream));
-            nuspecStream = nuspecStream ?? throw new ArgumentNullException(nameof(nuspecStream));
-
             var lowercasedId = package.Id.ToLowerInvariant();
             var lowercasedNormalizedVersion = package.NormalizedVersionString.ToLowerInvariant();
 
@@ -49,18 +38,18 @@ namespace BaGet.Core
             var readmePath = ReadmePath(lowercasedId, lowercasedNormalizedVersion);
             var iconPath = IconPath(lowercasedId, lowercasedNormalizedVersion);
 
-            _logger.LogInformation(
+            logger.LogInformation(
                 "Storing package {PackageId} {PackageVersion} at {Path}...",
                 lowercasedId,
                 lowercasedNormalizedVersion,
                 packagePath);
 
             // Store the package.
-            var result = await _storage.PutAsync(packagePath, packageStream, PackageContentType, cancellationToken);
+            var result = await storage.PutAsync(packagePath, packageStream, PackageContentType, cancellationToken);
             if (result == StoragePutResult.Conflict)
             {
                 // TODO: This should be returned gracefully with an enum.
-                _logger.LogInformation(
+                logger.LogInformation(
                     "Could not store package {PackageId} {PackageVersion} at {Path} due to conflict",
                     lowercasedId,
                     lowercasedNormalizedVersion,
@@ -70,17 +59,18 @@ namespace BaGet.Core
             }
 
             // Store the package's nuspec.
-            _logger.LogInformation(
+            logger.LogInformation(
                 "Storing package {PackageId} {PackageVersion} nuspec at {Path}...",
                 lowercasedId,
                 lowercasedNormalizedVersion,
                 nuspecPath);
 
-            result = await _storage.PutAsync(nuspecPath, nuspecStream, NuspecContentType, cancellationToken);
+            await using var nuspecStream = new BufferedStream(new FileStream(nuspecCacheFile.FullPath, FileMode.Open, FileAccess.Read));
+            result = await storage.PutAsync(nuspecPath, nuspecStream, NuspecContentType, cancellationToken);
             if (result == StoragePutResult.Conflict)
             {
                 // TODO: This should be returned gracefully with an enum.
-                _logger.LogInformation(
+                logger.LogInformation(
                     "Could not store package {PackageId} {PackageVersion} nuspec at {Path} due to conflict",
                     lowercasedId,
                     lowercasedNormalizedVersion,
@@ -90,19 +80,20 @@ namespace BaGet.Core
             }
 
             // Store the package's readme, if one exists.
-            if (readmeStream != null)
+            if (readmeCacheFile is not null)
             {
-                _logger.LogInformation(
+                logger.LogInformation(
                     "Storing package {PackageId} {PackageVersion} readme at {Path}...",
                     lowercasedId,
                     lowercasedNormalizedVersion,
                     readmePath);
 
-                result = await _storage.PutAsync(readmePath, readmeStream, ReadmeContentType, cancellationToken);
+                await using var readmeStream = new BufferedStream(new FileStream(readmeCacheFile.FullPath, FileMode.Open, FileAccess.Read));
+                result = await storage.PutAsync(readmePath, readmeStream, ReadmeContentType, cancellationToken);
                 if (result == StoragePutResult.Conflict)
                 {
                     // TODO: This should be returned gracefully with an enum.
-                    _logger.LogInformation(
+                    logger.LogInformation(
                         "Could not store package {PackageId} {PackageVersion} readme at {Path} due to conflict",
                         lowercasedId,
                         lowercasedNormalizedVersion,
@@ -113,19 +104,20 @@ namespace BaGet.Core
             }
 
             // Store the package's icon, if one exists.
-            if (iconStream != null)
+            if (iconCacheFile is not null)
             {
-                _logger.LogInformation(
+                logger.LogInformation(
                     "Storing package {PackageId} {PackageVersion} icon at {Path}...",
                     lowercasedId,
                     lowercasedNormalizedVersion,
                     iconPath);
 
-                result = await _storage.PutAsync(iconPath, iconStream, IconContentType, cancellationToken);
+                await using var iconStream = new BufferedStream(new FileStream(iconCacheFile.FullPath, FileMode.Open, FileAccess.Read));
+                result = await storage.PutAsync(iconPath, iconStream, IconContentType, cancellationToken);
                 if (result == StoragePutResult.Conflict)
                 {
                     // TODO: This should be returned gracefully with an enum.
-                    _logger.LogInformation(
+                    logger.LogInformation(
                         "Could not store package {PackageId} {PackageVersion} icon at {Path} due to conflict",
                         lowercasedId,
                         lowercasedNormalizedVersion,
@@ -135,7 +127,7 @@ namespace BaGet.Core
                 }
             }
 
-            _logger.LogInformation(
+            logger.LogInformation(
                 "Finished storing package {PackageId} {PackageVersion}",
                 lowercasedId,
                 lowercasedNormalizedVersion);
@@ -171,10 +163,10 @@ namespace BaGet.Core
             var readmePath = ReadmePath(lowercasedId, lowercasedNormalizedVersion);
             var iconPath = IconPath(lowercasedId, lowercasedNormalizedVersion);
 
-            await _storage.DeleteAsync(packagePath, cancellationToken);
-            await _storage.DeleteAsync(nuspecPath, cancellationToken);
-            await _storage.DeleteAsync(readmePath, cancellationToken);
-            await _storage.DeleteAsync(iconPath, cancellationToken);
+            await storage.DeleteAsync(packagePath, cancellationToken);
+            await storage.DeleteAsync(nuspecPath, cancellationToken);
+            await storage.DeleteAsync(readmePath, cancellationToken);
+            await storage.DeleteAsync(iconPath, cancellationToken);
         }
 
         private async Task<Stream> GetStreamAsync(
@@ -189,7 +181,7 @@ namespace BaGet.Core
 
             try
             {
-                return await _storage.GetAsync(path, cancellationToken);
+                return await storage.GetAsync(path, cancellationToken);
             }
             catch (DirectoryNotFoundException)
             {
@@ -197,7 +189,7 @@ namespace BaGet.Core
                 // on filesystems that are case sensitive. Handle this case to help
                 // users migrate to the latest version of BaGet.
                 // See https://github.com/loic-sharma/BaGet/issues/298
-                _logger.LogError(
+                logger.LogError(
                     $"Unable to find the '{PackagesPathPrefix}' folder. " +
                     "If you've recently upgraded BaGet, please make sure this folder starts with a lowercased letter. " +
                     "For more information, please see https://github.com/loic-sharma/BaGet/issues/298");

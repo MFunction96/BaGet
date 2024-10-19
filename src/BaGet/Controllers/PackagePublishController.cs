@@ -8,6 +8,7 @@ using NuGet.Versioning;
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using Xanadu.Skidbladnir.IO.File.Cache;
 
 namespace BaGet.Controllers
 {
@@ -19,11 +20,12 @@ namespace BaGet.Controllers
         IPackageDatabase packages,
         IPackageDeletionService deletionService,
         IOptions<BaGetOptions> options,
+        IFileCachePool fileCachePool,
         ILogger<PackagePublishController> logger)
         : ControllerBase
     {
         // See: https://docs.microsoft.com/en-us/nuget/api/package-publish-resource#push-a-package
-        [HttpPut("package")]
+        [HttpPut("package", Name = Routes.UploadPackageRouteName)]
         public async Task Upload(CancellationToken cancellationToken)
         {
             if (options.Value.IsReadOnlyMode ||
@@ -35,7 +37,8 @@ namespace BaGet.Controllers
 
             try
             {
-                await using var uploadStream = await Request.GetUploadStreamOrNullAsync(cancellationToken);
+                using var uploadFile = fileCachePool.Register();
+                await using var uploadStream = await Request.GetUploadStreamOrNullAsync(uploadFile, cancellationToken);
                 var result = await indexer.IndexAsync(uploadStream, cancellationToken);
 
                 HttpContext.Response.StatusCode = result switch
@@ -54,7 +57,7 @@ namespace BaGet.Controllers
             }
         }
 
-        [HttpDelete("package/{id}/{version}")]
+        [HttpDelete("package/{id}/{version}", Name = Routes.DeleteRouteName)]
         public async Task<IActionResult> Delete(string id, string version, CancellationToken cancellationToken)
         {
             if (options.Value.IsReadOnlyMode)
@@ -82,7 +85,7 @@ namespace BaGet.Controllers
             }
         }
 
-        [HttpPost("package/{id}/{version}")]
+        [HttpPost("package/{id}/{version}", Name = Routes.RelistRouteName)]
         public async Task<IActionResult> Relist(string id, string version, CancellationToken cancellationToken)
         {
             if (options.Value.IsReadOnlyMode)
@@ -104,10 +107,8 @@ namespace BaGet.Controllers
             {
                 return Ok();
             }
-            else
-            {
-                return NotFound();
-            }
+
+            return NotFound();
         }
     }
 }

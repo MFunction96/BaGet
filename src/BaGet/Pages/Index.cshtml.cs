@@ -1,4 +1,4 @@
-using BaGet.Core;
+using BaGet.Core.Search;
 using BaGet.Protocol.Models;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.AspNetCore.Mvc.RazorPages;
@@ -8,12 +8,10 @@ using System.ComponentModel.DataAnnotations;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using BaGet.Core.Search;
 
 namespace BaGet.Pages
 {
-    public class IndexModel(ISearchService search)
-        : PageModel
+    public class IndexModel(ISearchService search) : PageModel
     {
         public const int ResultsPerPage = 20;
 
@@ -37,8 +35,15 @@ namespace BaGet.Pages
 
         public async Task<IActionResult> OnGetAsync(CancellationToken cancellationToken)
         {
-            var packageType = PackageType == "any" ? null : PackageType;
-            var framework = Framework == "any" ? null : Framework;
+            if (string.IsNullOrEmpty(Query)
+                && string.Compare(PackageType, "any", StringComparison.OrdinalIgnoreCase) == 0
+                && string.Compare(Framework, "any", StringComparison.OrdinalIgnoreCase) == 0)
+            {
+                return Page();
+            }
+
+            var packageType = string.Compare(PackageType, "any", StringComparison.OrdinalIgnoreCase) == 0 ? null : PackageType;
+            var framework = string.Compare(Framework, "any", StringComparison.OrdinalIgnoreCase) == 0 ? null : Framework;
 
             var search1 = await search.SearchAsync(
                 new SearchRequest
@@ -53,7 +58,7 @@ namespace BaGet.Pages
                 },
                 cancellationToken);
 
-            Packages = search1.Data.ToList();
+            Packages = search1.Data?.ToList() ?? new List<SearchResult>();
 
             return Page();
         }

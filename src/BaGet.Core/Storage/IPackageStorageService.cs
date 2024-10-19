@@ -1,10 +1,11 @@
+using BaGet.Core.Entities;
+using NuGet.Versioning;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using BaGet.Core.Entities;
-using NuGet.Versioning;
+using Xanadu.Skidbladnir.IO.File.Cache;
 
-namespace BaGet.Core
+namespace BaGet.Core.Storage
 {
     /// <summary>
     /// Stores packages' content. Packages' state are stored by the
@@ -18,17 +19,17 @@ namespace BaGet.Core
         /// </summary>
         /// <param name="package">The package's metadata.</param>
         /// <param name="packageStream">The package's nupkg stream.</param>
-        /// <param name="nuspecStream">The package's nuspec stream.</param>
-        /// <param name="readmeStream">The package's readme stream, or null if none.</param>
-        /// <param name="iconStream">The package's icon stream, or null if none.</param>
+        /// <param name="nuspecCacheFile">The package's nuspec stream.</param>
+        /// <param name="readmeCacheFile">The package's readme stream, or null if none.</param>
+        /// <param name="iconCacheFile">The package's icon stream, or null if none.</param>
         /// <param name="cancellationToken"></param>
         /// <returns></returns>
         Task SavePackageContentAsync(
             Package package,
             Stream packageStream,
-            Stream nuspecStream,
-            Stream readmeStream,
-            Stream iconStream,
+            FileCache nuspecCacheFile,
+            FileCache? readmeCacheFile,
+            FileCache? iconCacheFile,
             CancellationToken cancellationToken);
 
         /// <summary>

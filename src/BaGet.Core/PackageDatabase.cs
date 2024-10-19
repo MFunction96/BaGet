@@ -1,11 +1,11 @@
+using BaGet.Core.Entities;
+using Microsoft.EntityFrameworkCore;
+using NuGet.Versioning;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using BaGet.Core.Entities;
-using Microsoft.EntityFrameworkCore;
-using NuGet.Versioning;
 
 namespace BaGet.Core
 {
@@ -60,7 +60,7 @@ namespace BaGet.Core
             return (await query.ToListAsync(cancellationToken)).AsReadOnly();
         }
 
-        public Task<Package> FindOrNullAsync(
+        public Task<Package?> FindOrNullAsync(
             string id,
             NuGetVersion version,
             bool includeUnlisted,
