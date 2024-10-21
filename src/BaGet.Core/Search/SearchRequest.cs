@@ -6,15 +6,12 @@ namespace BaGet.Core.Search
     /// </summary>
     public class SearchRequest
     {
-        /// <summary>
-        /// The number of results to skip, for pagination.
-        /// </summary>
-        public int Skip { get; set; }
+        public int PageIndex { get; set; }
 
         /// <summary>
         /// The number of results to return, for pagination.
         /// </summary>
-        public int Take { get; set; }
+        public int PageCount { get; set; }
 
         /// <summary>
         /// Whether to include pre-release packages.

@@ -61,7 +61,8 @@ namespace BaGet.Core
 
         public Task<bool> ExistsAsync(string id, NuGetVersion version, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
+            // TODO: Implement this
+            return Task.FromResult(false);
             //return await MirrorAsync(id, version, cancellationToken);
         }
 

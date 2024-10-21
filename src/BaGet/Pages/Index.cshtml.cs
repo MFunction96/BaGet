@@ -48,8 +48,8 @@ namespace BaGet.Pages
             var search1 = await search.SearchAsync(
                 new SearchRequest
                 {
-                    Skip = (PageIndex - 1) * ResultsPerPage,
-                    Take = ResultsPerPage,
+                    PageIndex = PageIndex,
+                    PageCount = ResultsPerPage,
                     IncludePrerelease = Prerelease,
                     IncludeSemVer2 = true,
                     PackageType = packageType,

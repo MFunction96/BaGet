@@ -1,20 +1,12 @@
-using System;
+using BaGet.Protocol.Models;
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
-using BaGet.Protocol.Models;
 
 namespace BaGet.Core
 {
-    public class BaGetServiceIndex : IServiceIndexService
+    public class BaGetServiceIndex(IUrlGenerator urlGenerator) : IServiceIndexService
     {
-        private readonly IUrlGenerator _url;
-
-        public BaGetServiceIndex(IUrlGenerator url)
-        {
-            _url = url ?? throw new ArgumentNullException(nameof(url));
-        }
-
         private IEnumerable<ServiceIndexItem> BuildResource(string name, string url, params string[] versions)
         {
             foreach (var version in versions)
@@ -33,12 +25,12 @@ namespace BaGet.Core
         {
             var resources = new List<ServiceIndexItem>();
 
-            resources.AddRange(BuildResource("PackagePublish", _url.GetPackagePublishResourceUrl(), "2.0.0"));
-            resources.AddRange(BuildResource("SymbolPackagePublish", _url.GetSymbolPublishResourceUrl(), "4.9.0"));
-            resources.AddRange(BuildResource("SearchQueryService", _url.GetSearchResourceUrl(), "", "3.0.0-beta", "3.0.0-rc"));
-            resources.AddRange(BuildResource("RegistrationsBaseUrl", _url.GetPackageMetadataResourceUrl(), "", "3.0.0-rc", "3.0.0-beta"));
-            resources.AddRange(BuildResource("PackageBaseAddress", _url.GetPackageContentResourceUrl(), "3.0.0"));
-            resources.AddRange(BuildResource("SearchAutocompleteService", _url.GetAutocompleteResourceUrl(), "", "3.0.0-rc", "3.0.0-beta"));
+            resources.AddRange(BuildResource("PackagePublish", urlGenerator.GetPackagePublishResourceUrl(), "2.0.0"));
+            resources.AddRange(BuildResource("SymbolPackagePublish", urlGenerator.GetSymbolPublishResourceUrl(), "4.9.0"));
+            resources.AddRange(BuildResource("SearchQueryService", urlGenerator.GetSearchResourceUrl(), "", "3.0.0-beta", "3.0.0-rc"));
+            resources.AddRange(BuildResource("RegistrationsBaseUrl", urlGenerator.GetPackageMetadataResourceUrl(), "", "3.0.0-rc", "3.0.0-beta"));
+            resources.AddRange(BuildResource("PackageBaseAddress", urlGenerator.GetPackageContentResourceUrl(), "3.0.0"));
+            resources.AddRange(BuildResource("SearchAutocompleteService", urlGenerator.GetAutocompleteResourceUrl(), "", "3.0.0-rc", "3.0.0-beta"));
 
             var result = new ServiceIndexResponse
             {

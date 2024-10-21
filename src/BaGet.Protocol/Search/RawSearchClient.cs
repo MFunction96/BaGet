@@ -53,8 +53,8 @@ namespace BaGet.Protocol.Internal
         {
             var queryString = new Dictionary<string, string>();
 
-            if (skip.HasValue && skip.Value > 0) queryString["skip"] = skip.ToString();
-            if (take.HasValue) queryString["take"] = take.ToString();
+            if (skip.HasValue && skip.Value > 0) queryString["pageIndex"] = skip.ToString();
+            if (take.HasValue) queryString["pageCount"] = take.ToString();
             if (includePrerelease) queryString["prerelease"] = true.ToString();
             if (includeSemVer2) queryString["semVerLevel"] = "2.0.0";
 

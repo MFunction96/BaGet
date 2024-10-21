@@ -1,10 +1,8 @@
+using Microsoft.AspNetCore.Http;
 using System;
 using System.IO;
 using System.Threading;
 using System.Threading.Tasks;
-using BaGet.Core;
-using BaGet.Core.Extensions;
-using Microsoft.AspNetCore.Http;
 using Xanadu.Skidbladnir.IO.File.Cache;
 
 namespace BaGet.Extensions

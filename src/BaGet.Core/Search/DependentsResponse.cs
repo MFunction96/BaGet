@@ -10,7 +10,7 @@ namespace BaGet.Core
     public class DependentsResponse
     {
         /// <summary>
-        /// The total number of matches, disregarding skip and take.
+        /// The total number of matches, disregarding pageIndex and pageCount.
         /// </summary>
         [JsonPropertyName("totalHits")]
         public long TotalHits { get; set; }

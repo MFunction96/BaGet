@@ -14,8 +14,8 @@ namespace BaGet.Controllers
         [HttpGet("search", Name = Routes.SearchRouteName)]
         public async Task<ActionResult<SearchResponse>> SearchAsync(
             [FromQuery(Name = "q")] string query = "",
-            [FromQuery]int skip = 0,
-            [FromQuery]int take = 20,
+            [FromQuery]int pageIndex = 1,
+            [FromQuery]int pageCount = 20,
             [FromQuery]bool prerelease = false,
             [FromQuery]string semVerLevel = "",
 
@@ -26,8 +26,8 @@ namespace BaGet.Controllers
         {
             var request = new SearchRequest
             {
-                Skip = skip,
-                Take = take,
+                PageIndex = pageIndex,
+                PageCount = pageCount,
                 IncludePrerelease = prerelease,
                 IncludeSemVer2 = semVerLevel.Trim() == "2.0.0",
                 PackageType = packageType.Trim(),

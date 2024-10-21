@@ -325,7 +325,7 @@ namespace BaGet.Protocol
         /// <param name="query">
         /// The search query. If <see langword="null"/>, gets default search results.
         /// </param>
-        /// <param name="skip">The number of results to skip.</param>
+        /// <param name="skip">The number of results to pageIndex.</param>
         /// <param name="take">The number of results to include.</param>
         /// <param name="cancellationToken">A token to cancel the task.</param>
         /// <returns>The search results, including prerelease packages.</returns>
@@ -374,7 +374,7 @@ namespace BaGet.Protocol
         /// <param name="query">
         /// The search query. If <see langword="null"/>, gets default search results.
         /// </param>
-        /// <param name="skip">The number of results to skip.</param>
+        /// <param name="skip">The number of results to pageIndex.</param>
         /// <param name="take">The number of results to include.</param>
         /// <param name="includePrerelease">Whether to include prerelease packages.</param>
         /// <param name="cancellationToken">A token to cancel the task.</param>
@@ -420,7 +420,7 @@ namespace BaGet.Protocol
         /// <param name="query">
         /// The search query. If <see langword="null"/>, gets default autocomplete results.
         /// </param>
-        /// <param name="skip">The number of results to skip.</param>
+        /// <param name="skip">The number of results to pageIndex.</param>
         /// <param name="take">The number of results to include.</param>
         /// <param name="cancellationToken">A token to cancel the task.</param>
         /// <returns>The package IDs that matched the query.</returns>
@@ -469,7 +469,7 @@ namespace BaGet.Protocol
         /// <param name="query">
         /// The search query. If <see langword="null"/>, gets default autocomplete results.
         /// </param>
-        /// <param name="skip">The number of results to skip.</param>
+        /// <param name="skip">The number of results to pageIndex.</param>
         /// <param name="take">The number of results to include.</param>
         /// <param name="includePrerelease">Whether to include prerelease packages.</param>
         /// <param name="cancellationToken">A token to cancel the task.</param>

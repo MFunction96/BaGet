@@ -1,10 +1,9 @@
-using System.Threading;
-using System.Threading.Tasks;
-using BaGet.Core;
 using BaGet.Core.Search;
 using BaGet.Pages;
 using BaGet.Protocol.Models;
 using Moq;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace BaGet.Web.Tests
@@ -47,8 +46,8 @@ namespace BaGet.Web.Tests
 
             await _target.OnGetAsync(_cancellation);
 
-            Assert.Equal(80, _capturedRequest.Skip);
-            Assert.Equal(20, _capturedRequest.Take);
+            Assert.Equal(5, _capturedRequest.PageIndex);
+            Assert.Equal(20, _capturedRequest.PageCount);
             Assert.False(_capturedRequest.IncludePrerelease);
             Assert.True(_capturedRequest.IncludeSemVer2);
             Assert.Equal("foo", _capturedRequest.PackageType);

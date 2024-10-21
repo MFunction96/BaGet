@@ -247,7 +247,7 @@
 }</value>
   </data>
   <data name="DefaultAutocompleteUrl" xml:space="preserve">
-    <value>https://test.example/v3/autocomplete?take=20&amp;prerelease=True&amp;semVerLevel=2.0.0</value>
+    <value>https://test.example/v3/autocomplete?pageCount=20&amp;prerelease=True&amp;semVerLevel=2.0.0</value>
   </data>
   <data name="DefaultSearch" xml:space="preserve">
     <value>{
@@ -305,7 +305,7 @@
 }</value>
   </data>
   <data name="DefaultSearchUrl" xml:space="preserve">
-    <value>https://test.example/v3/search?take=20&amp;prerelease=True&amp;semVerLevel=2.0.0</value>
+    <value>https://test.example/v3/search?pageCount=20&amp;prerelease=True&amp;semVerLevel=2.0.0</value>
   </data>
   <data name="PackageContentUrl" xml:space="preserve">
     <value>https://test.example/v3/content</value>

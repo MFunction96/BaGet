@@ -14,7 +14,7 @@ namespace BaGet.Protocol.Models
         public SearchContext? Context { get; set; }
 
         /// <summary>
-        /// The total number of matches, disregarding skip and take.
+        /// The total number of matches, disregarding pageIndex and pageCount.
         /// </summary>
         [JsonPropertyName("totalHits")]
         public long TotalHits { get; set; }

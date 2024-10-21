@@ -20,7 +20,7 @@ namespace BaGet.Core
         public static bool HasEmbeddedIcon(this PackageArchiveReader package)
             => !string.IsNullOrEmpty(package.NuspecReader.GetIcon());
 
-        public async static Task<Stream> GetReadmeAsync(
+        public static async Task<Stream> GetReadmeAsync(
             this PackageArchiveReader package,
             CancellationToken cancellationToken)
         {

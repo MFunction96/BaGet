@@ -18,6 +18,7 @@ using Microsoft.Extensions.Options;
 using Serilog;
 using System;
 using System.Text;
+using System.Text.Json.Serialization;
 using Xanadu.Skidbladnir.IO.File.Cache;
 
 namespace BaGet
@@ -76,6 +77,10 @@ namespace BaGet
                 applicationBuilder.Services.AddEndpointsApiExplorer();
                 applicationBuilder.Services.AddSwaggerGen();
                 applicationBuilder.Services.AddHttpContextAccessor();
+                applicationBuilder.Services.ConfigureHttpJsonOptions(option =>
+                {
+                    option.SerializerOptions.DefaultIgnoreCondition = JsonIgnoreCondition.WhenWritingNull;
+                });
 
                 // Add Xanadu services.
                 applicationBuilder.Services.AddSingleton<IFileCachePool, FileCachePool>();
@@ -112,6 +117,7 @@ namespace BaGet
                 });
 
                 var app = applicationBuilder.Build();
+
                 using (var scope = app.Services.CreateScope())
                 {
                     var db = scope.ServiceProvider.GetRequiredService<BaGetDbContext>();

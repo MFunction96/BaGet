@@ -1,10 +1,12 @@
 using BaGet.Core.Entities;
 using BaGet.Core.Indexing;
+using BaGet.Core.Metadata;
 using BaGet.Protocol.Models;
 using Microsoft.EntityFrameworkCore;
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using System.Linq.Dynamic.Core;
 using System.Threading;
 using System.Threading.Tasks;
 
@@ -16,7 +18,7 @@ namespace BaGet.Core.Search
         ISearchResponseBuilder searchBuilder)
         : ISearchService
     {
-        public async Task<SearchResponse> SearchAsync(SearchRequest request,  CancellationToken cancellationToken)
+        public async Task<SearchResponse> SearchAsync(SearchRequest request, CancellationToken cancellationToken)
         {
             var frameworks = GetCompatibleFrameworksOrNull(request.Framework);
 
@@ -33,42 +35,15 @@ namespace BaGet.Core.Search
                 request.PackageType,
                 frameworks);
 
-            var packageIds = search
-                .Select(p => p.Id)
+            var results = search
                 .Distinct()
                 .OrderBy(id => id)
-                .Skip(request.Skip)
-                .Take(request.Take);
+                .Page(request.PageIndex, request.PageCount);
 
-            // This query MUST fetch all versions for each package that matches the search,
-            // otherwise the results for a package's latest version may be incorrect.
-            // If possible, we'll find all these packages in a single query by matching
-            // the package IDs in a subquery. Otherwise, run two queries:
-            //   1. Find the package IDs that match the search
-            //   2. Find all package versions for these package IDs
-            //if (context.SupportsLimitInSubqueries)
-            //{
-            //    search = context.Packages.Where(p => packageIds.Contains(p.Id));
-            //}
-            //else
-            //{
-
-            //}
-            var packageIdResults = await packageIds.ToListAsync(cancellationToken);
-
-            search = context.Packages.Where(p => packageIdResults.Contains(p.Id));
-
-            search = ApplySearchFilters(
-                search,
-                request.IncludePrerelease,
-                request.IncludeSemVer2,
-                request.PackageType,
-                frameworks);
-
-            var results = await search.ToListAsync(cancellationToken);
             var groupedResults = results
-                .GroupBy(p => p.Id, StringComparer.OrdinalIgnoreCase)
-                .Select(group => new PackageRegistration(group.Key, group.ToList()))
+                .GroupBy(p => p.Id)
+                .Select(group => new PackageRegistration(group.Key, group.ToArray()))
+                .AsEnumerable()
                 .ToList();
 
             return searchBuilder.BuildSearch(groupedResults);
@@ -154,7 +129,7 @@ namespace BaGet.Core.Search
             return query.Where(p => p.Id.ToLower().Contains(search));
         }
 
-        private IQueryable<Package> ApplySearchFilters(
+        private static IQueryable<Package> ApplySearchFilters(
             IQueryable<Package> query,
             bool includePrerelease,
             bool includeSemVer2,

@@ -31,8 +31,8 @@ namespace BaGet.Protocol.Tests
             // TODO: Assert request URL query parameters.
             // var response = await _target.AutocompleteAsync(
             //     "query",
-            //     skip: 2,
-            //     take: 5,
+            //     pageIndex: 2,
+            //     pageCount: 5,
             //     includePrerelease: false,
             //     includeSemVer2: false);
         }
