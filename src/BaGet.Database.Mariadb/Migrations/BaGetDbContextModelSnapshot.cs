@@ -114,10 +114,9 @@ namespace BaGet.Database.Mariadb.Migrations
                     b.Property<bool>("RequireLicenseAcceptance")
                         .HasColumnType("tinyint(1)");
 
-                    b.Property<DateTime>("RowVersion")
+                    b.Property<Guid>("RowVersion")
                         .IsConcurrencyToken()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("timestamp(6)");
+                        .HasColumnType("char(36)");
 
                     b.Property<int>("SemVerLevel")
                         .HasColumnType("int");

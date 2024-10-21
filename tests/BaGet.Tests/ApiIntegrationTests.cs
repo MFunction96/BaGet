@@ -1,10 +1,10 @@
+using BaGet.Tests.Support;
 using System;
 using System.IO;
 using System.Net;
 using System.Net.Http;
 using System.Threading.Tasks;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace BaGet.Tests
 {
@@ -16,9 +16,9 @@ namespace BaGet.Tests
         private readonly Stream _packageStream;
         private readonly Stream _symbolPackageStream;
 
-        public ApiIntegrationTests(ITestOutputHelper output)
+        public ApiIntegrationTests()
         {
-            _app = new BaGetApplication(output);
+            _app = new BaGetApplication();
             _client = _app.CreateClient();
 
             _packageStream = TestResources.GetResourceStream(TestResources.Package);

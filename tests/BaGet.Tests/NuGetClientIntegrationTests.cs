@@ -1,15 +1,15 @@
+using BaGet.Tests.Support;
+using NuGet.Configuration;
+using NuGet.Protocol;
+using NuGet.Protocol.Core.Types;
+using NuGet.Versioning;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using NuGet.Configuration;
-using NuGet.Protocol;
-using NuGet.Protocol.Core.Types;
-using NuGet.Versioning;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace BaGet.Tests
 {
@@ -28,9 +28,9 @@ namespace BaGet.Tests
         private readonly NuGet.Common.ILogger _logger;
         private readonly CancellationToken _cancellationToken;
 
-        public NuGetClientIntegrationTests(ITestOutputHelper output)
+        public NuGetClientIntegrationTests()
         {
-            _app = new BaGetApplication(output);
+            _app = new BaGetApplication();
             _client = _app.CreateDefaultClient();
             _packageStream = TestResources.GetResourceStream(TestResources.Package);
 

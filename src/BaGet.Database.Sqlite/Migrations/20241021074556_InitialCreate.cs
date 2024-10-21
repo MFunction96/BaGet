@@ -39,7 +39,7 @@ namespace BaGet.Database.Sqlite.Migrations
                     RepositoryUrl = table.Column<string>(type: "TEXT", nullable: true),
                     RepositoryType = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
                     Tags = table.Column<string>(type: "TEXT", nullable: true),
-                    RowVersion = table.Column<byte[]>(type: "BLOB", rowVersion: true, nullable: false),
+                    RowVersion = table.Column<Guid>(type: "TEXT", nullable: false),
                     Version = table.Column<string>(type: "TEXT", maxLength: 64, nullable: false),
                     OriginalVersion = table.Column<string>(type: "TEXT", maxLength: 64, nullable: true)
                 },

@@ -1,5 +1,7 @@
 using BaGet.Core.Entities;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
+using Newtonsoft.Json;
 using NuGet.Versioning;
 using System;
 using System.Collections.Generic;
@@ -9,7 +11,7 @@ using System.Threading.Tasks;
 
 namespace BaGet.Core
 {
-    public class PackageDatabase(BaGetDbContext context) : IPackageDatabase
+    public class PackageDatabase(BaGetDbContext context, ILogger<PackageDatabase> logger) : IPackageDatabase
     {
         public async Task<PackageAddResult> AddAsync(Package package, CancellationToken cancellationToken)
         {
@@ -23,6 +25,7 @@ namespace BaGet.Core
             }
             catch (DbUpdateException e)
             {
+                logger.LogWarning(e, "Failed to add package metadata to Database. {package}", JsonConvert.SerializeObject(package, Formatting.None));
                 return PackageAddResult.PackageAlreadyExists;
             }
         }

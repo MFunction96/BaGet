@@ -117,6 +117,7 @@ namespace BaGet
                     var db = scope.ServiceProvider.GetRequiredService<BaGetDbContext>();
                     db.Database.Migrate();
                 }
+
                 var options = app.Configuration.Get<BaGetOptions>()!;
 
                 if (app.Environment.IsDevelopment())

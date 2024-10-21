@@ -107,11 +107,9 @@ namespace BaGet.Database.Sqlite.Migrations
                     b.Property<bool>("RequireLicenseAcceptance")
                         .HasColumnType("INTEGER");
 
-                    b.Property<byte[]>("RowVersion")
+                    b.Property<Guid>("RowVersion")
                         .IsConcurrencyToken()
-                        .IsRequired()
-                        .ValueGeneratedOnAddOrUpdate()
-                        .HasColumnType("BLOB");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("SemVerLevel")
                         .HasColumnType("INTEGER");

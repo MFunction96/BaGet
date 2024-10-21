@@ -33,7 +33,7 @@ namespace BaGet.Core
             return await package.GetStreamAsync(readmePath, cancellationToken);
         }
 
-        public async static Task<Stream> GetIconAsync(
+        public static async Task<Stream> GetIconAsync(
             this PackageArchiveReader package,
             CancellationToken cancellationToken)
         {
@@ -46,7 +46,7 @@ namespace BaGet.Core
         {
             var nuspec = packageReader.NuspecReader;
 
-            (var repositoryUri, var repositoryType) = GetRepositoryMetadata(nuspec);
+            var (repositoryUri, repositoryType) = GetRepositoryMetadata(nuspec);
 
             return new Package
             {
@@ -66,11 +66,11 @@ namespace BaGet.Core
                 SemVerLevel = GetSemVerLevel(nuspec),
                 Summary = nuspec.GetSummary(),
                 Title = nuspec.GetTitle(),
-                IconUrl = new Uri(nuspec.GetIconUrl()),
-                LicenseUrl = new Uri(nuspec.GetLicenseUrl()),
-                ProjectUrl = new Uri(nuspec.GetProjectUrl()),
+                IconUrl = ParseUri(nuspec.GetIconUrl()),
+                LicenseUrl = ParseUri(nuspec.GetLicenseUrl()),
+                ProjectUrl = ParseUri(nuspec.GetProjectUrl()),
                 RepositoryUrl = repositoryUri,
-                RepositoryType = repositoryType,
+                RepositoryType = repositoryType ?? string.Empty,
                 Dependencies = GetDependencies(nuspec),
                 Tags = ParseTags(nuspec.GetTags()),
                 PackageTypes = GetPackageTypes(nuspec),
@@ -103,16 +103,12 @@ namespace BaGet.Core
 
         private static Uri? ParseUri(string uriString)
         {
-            if (string.IsNullOrEmpty(uriString)) return null;
-
-            return new Uri(uriString);
+            return string.IsNullOrEmpty(uriString) ? null : new Uri(uriString);
         }
 
         private static string[] ParseAuthors(string authors)
         {
-            if (string.IsNullOrEmpty(authors)) return new string[0];
-
-            return authors.Split(new[] { ',', ';', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+            return string.IsNullOrEmpty(authors) ? [] : authors.Split([',', ';', '\t', '\n', '\r'], StringSplitOptions.RemoveEmptyEntries);
         }
 
         private static string[] ParseTags(string tags)
@@ -122,7 +118,7 @@ namespace BaGet.Core
             return tags.Split(new[] { ',', ';', ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
         }
 
-        private static (Uri repositoryUrl, string repositoryType) GetRepositoryMetadata(NuspecReader nuspec)
+        private static (Uri? repositoryUrl, string? repositoryType) GetRepositoryMetadata(NuspecReader nuspec)
         {
             var repository = nuspec.GetRepositoryMetadata();
 

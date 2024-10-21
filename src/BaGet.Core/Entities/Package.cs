@@ -79,10 +79,10 @@ namespace BaGet.Core.Entities
         public ICollection<string>? Tags { get; set; }
 
         /// <summary>
-        /// Used for optimistic concurrency.
+        /// Used for optimistic concurrency. TODO: Create an interceptors onto SaveChanges to handle this.
         /// </summary>
-        [Timestamp]
-        public byte[] RowVersion { get; set; }
+        [ConcurrencyCheck]
+        public Guid RowVersion { get; set; } = Guid.NewGuid();
         
         [Column("Version")]
         [Unicode]

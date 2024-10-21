@@ -1,12 +1,12 @@
+using BaGet.Protocol;
+using BaGet.Protocol.Models;
+using BaGet.Tests.Support;
+using NuGet.Versioning;
 using System;
 using System.IO;
 using System.Net.Http;
 using System.Threading.Tasks;
-using BaGet.Protocol;
-using BaGet.Protocol.Models;
-using NuGet.Versioning;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace BaGet.Tests
 {
@@ -22,9 +22,9 @@ namespace BaGet.Tests
 
         private readonly Stream _packageStream;
 
-        public BaGetClientIntegrationTests(ITestOutputHelper output)
+        public BaGetClientIntegrationTests()
         {
-            _app = new BaGetApplication(output);
+            _app = new BaGetApplication();
 
             var serviceIndexUrl = new Uri(_app.Server.BaseAddress, "v3/index.json");
 
