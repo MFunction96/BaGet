@@ -139,7 +139,7 @@ namespace BaGet.Database.Sqlite.Migrations
                     b.ToTable("Packages");
                 });
 
-            modelBuilder.Entity("BaGet.Core.PackageDependency", b =>
+            modelBuilder.Entity("BaGet.Core.Entities.PackageDependency", b =>
                 {
                     b.Property<int>("Key")
                         .ValueGeneratedOnAdd()
@@ -150,7 +150,7 @@ namespace BaGet.Database.Sqlite.Migrations
                         .IsUnicode(true)
                         .HasColumnType("TEXT");
 
-                    b.Property<int?>("PackageKey")
+                    b.Property<int>("PackageKey")
                         .HasColumnType("INTEGER");
 
                     b.Property<string>("TargetFramework")
@@ -172,7 +172,7 @@ namespace BaGet.Database.Sqlite.Migrations
                     b.ToTable("PackageDependencies");
                 });
 
-            modelBuilder.Entity("BaGet.Core.PackageType", b =>
+            modelBuilder.Entity("BaGet.Core.Entities.PackageType", b =>
                 {
                     b.Property<int>("Key")
                         .ValueGeneratedOnAdd()
@@ -200,7 +200,7 @@ namespace BaGet.Database.Sqlite.Migrations
                     b.ToTable("PackageTypes");
                 });
 
-            modelBuilder.Entity("BaGet.Core.TargetFramework", b =>
+            modelBuilder.Entity("BaGet.Core.Entities.TargetFramework", b =>
                 {
                     b.Property<int>("Key")
                         .ValueGeneratedOnAdd()
@@ -211,7 +211,7 @@ namespace BaGet.Database.Sqlite.Migrations
                         .IsUnicode(true)
                         .HasColumnType("TEXT");
 
-                    b.Property<int>("PackageKey")
+                    b.Property<int?>("PackageKey")
                         .HasColumnType("INTEGER");
 
                     b.HasKey("Key");
@@ -223,16 +223,18 @@ namespace BaGet.Database.Sqlite.Migrations
                     b.ToTable("TargetFrameworks");
                 });
 
-            modelBuilder.Entity("BaGet.Core.PackageDependency", b =>
+            modelBuilder.Entity("BaGet.Core.Entities.PackageDependency", b =>
                 {
                     b.HasOne("BaGet.Core.Entities.Package", "Package")
                         .WithMany("Dependencies")
-                        .HasForeignKey("PackageKey");
+                        .HasForeignKey("PackageKey")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Package");
                 });
 
-            modelBuilder.Entity("BaGet.Core.PackageType", b =>
+            modelBuilder.Entity("BaGet.Core.Entities.PackageType", b =>
                 {
                     b.HasOne("BaGet.Core.Entities.Package", "Package")
                         .WithMany("PackageTypes")
@@ -243,13 +245,11 @@ namespace BaGet.Database.Sqlite.Migrations
                     b.Navigation("Package");
                 });
 
-            modelBuilder.Entity("BaGet.Core.TargetFramework", b =>
+            modelBuilder.Entity("BaGet.Core.Entities.TargetFramework", b =>
                 {
                     b.HasOne("BaGet.Core.Entities.Package", "Package")
                         .WithMany("TargetFrameworks")
-                        .HasForeignKey("PackageKey")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("PackageKey");
 
                     b.Navigation("Package");
                 });

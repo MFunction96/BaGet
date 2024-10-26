@@ -12,7 +12,7 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace BaGet.Database.Mariadb.Migrations
 {
     [DbContext(typeof(BaGetDbContext))]
-    [Migration("20241021074529_InitialCreate")]
+    [Migration("20241026025414_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
@@ -149,7 +149,7 @@ namespace BaGet.Database.Mariadb.Migrations
                     b.ToTable("Packages");
                 });
 
-            modelBuilder.Entity("BaGet.Core.PackageDependency", b =>
+            modelBuilder.Entity("BaGet.Core.Entities.PackageDependency", b =>
                 {
                     b.Property<int>("Key")
                         .ValueGeneratedOnAdd()
@@ -162,7 +162,7 @@ namespace BaGet.Database.Mariadb.Migrations
                         .IsUnicode(true)
                         .HasColumnType("varchar(128)");
 
-                    b.Property<int?>("PackageKey")
+                    b.Property<int>("PackageKey")
                         .HasColumnType("int");
 
                     b.Property<string>("TargetFramework")
@@ -184,7 +184,7 @@ namespace BaGet.Database.Mariadb.Migrations
                     b.ToTable("PackageDependencies");
                 });
 
-            modelBuilder.Entity("BaGet.Core.PackageType", b =>
+            modelBuilder.Entity("BaGet.Core.Entities.PackageType", b =>
                 {
                     b.Property<int>("Key")
                         .ValueGeneratedOnAdd()
@@ -214,7 +214,7 @@ namespace BaGet.Database.Mariadb.Migrations
                     b.ToTable("PackageTypes");
                 });
 
-            modelBuilder.Entity("BaGet.Core.TargetFramework", b =>
+            modelBuilder.Entity("BaGet.Core.Entities.TargetFramework", b =>
                 {
                     b.Property<int>("Key")
                         .ValueGeneratedOnAdd()
@@ -227,7 +227,7 @@ namespace BaGet.Database.Mariadb.Migrations
                         .IsUnicode(true)
                         .HasColumnType("varchar(256)");
 
-                    b.Property<int>("PackageKey")
+                    b.Property<int?>("PackageKey")
                         .HasColumnType("int");
 
                     b.HasKey("Key");
@@ -239,16 +239,18 @@ namespace BaGet.Database.Mariadb.Migrations
                     b.ToTable("TargetFrameworks");
                 });
 
-            modelBuilder.Entity("BaGet.Core.PackageDependency", b =>
+            modelBuilder.Entity("BaGet.Core.Entities.PackageDependency", b =>
                 {
                     b.HasOne("BaGet.Core.Entities.Package", "Package")
                         .WithMany("Dependencies")
-                        .HasForeignKey("PackageKey");
+                        .HasForeignKey("PackageKey")
+                        .OnDelete(DeleteBehavior.Cascade)
+                        .IsRequired();
 
                     b.Navigation("Package");
                 });
 
-            modelBuilder.Entity("BaGet.Core.PackageType", b =>
+            modelBuilder.Entity("BaGet.Core.Entities.PackageType", b =>
                 {
                     b.HasOne("BaGet.Core.Entities.Package", "Package")
                         .WithMany("PackageTypes")
@@ -259,13 +261,11 @@ namespace BaGet.Database.Mariadb.Migrations
                     b.Navigation("Package");
                 });
 
-            modelBuilder.Entity("BaGet.Core.TargetFramework", b =>
+            modelBuilder.Entity("BaGet.Core.Entities.TargetFramework", b =>
                 {
                     b.HasOne("BaGet.Core.Entities.Package", "Package")
                         .WithMany("TargetFrameworks")
-                        .HasForeignKey("PackageKey")
-                        .OnDelete(DeleteBehavior.Cascade)
-                        .IsRequired();
+                        .HasForeignKey("PackageKey");
 
                     b.Navigation("Package");
                 });

@@ -1,18 +1,22 @@
+using Microsoft.EntityFrameworkCore;
+using NuGet.Versioning;
 using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
-using Microsoft.EntityFrameworkCore;
-using NuGet.Versioning;
 
 // ReSharper disable EntityFramework.ModelValidation.UnlimitedStringLength
 
 namespace BaGet.Core.Entities
 {
-    // See NuGetGallery's: https://github.com/NuGet/NuGetGallery/blob/master/src/NuGetGallery.Core/Entities/Package.cs
+    // See NuGetGallery's: https://github.com/NuGet/NuGetGallery/blob/main/src/NuGet.Services.Entities/Package.cs
     [Index(nameof(Id))]
-    public class Package
+    public class Package : IEntity
     {
+        public ICollection<PackageDependency> Dependencies { get; set; } = new HashSet<PackageDependency>();
+        public ICollection<PackageType> PackageTypes { get; set; } = new HashSet<PackageType>();
+        public ICollection<TargetFramework> TargetFrameworks { get; set; } = new HashSet<TargetFramework>();
+
         [Key]
         public int Key { get; set; }
 
@@ -38,16 +42,14 @@ namespace BaGet.Core.Entities
         }
 
         [Unicode]
-        public ICollection<string> Authors { get; set; } = new List<string>();
-
-        [Unicode]
         [Column(TypeName = "text")]
         public string Description { get; set; } = string.Empty;
         public long Downloads { get; set; }
         public bool HasReadme { get; set; }
         public bool HasEmbeddedIcon { get; set; }
         public bool IsPrerelease { get; set; }
-
+        [Unicode]
+        public List<string> Authors { get; set; } = [];
         [Unicode]
         [Column(TypeName = "text")]
         public string? ReleaseNotes { get; set; }
@@ -76,7 +78,7 @@ namespace BaGet.Core.Entities
         public string RepositoryType { get; set; } = string.Empty;
 
         [Unicode]
-        public ICollection<string>? Tags { get; set; }
+        public List<string>? Tags { get; set; }
 
         /// <summary>
         /// Used for optimistic concurrency. TODO: Create an interceptors onto SaveChanges to handle this.
@@ -94,9 +96,5 @@ namespace BaGet.Core.Entities
         [Unicode]
         [MaxLength(BaGetDbContext.MaxPackageVersionLength)]
         public string? OriginalVersionString { get; set; }
-
-        public ICollection<PackageDependency> Dependencies { get; set; } = new List<PackageDependency>();
-        public ICollection<PackageType> PackageTypes { get; set; } = new List<PackageType>();
-        public ICollection<TargetFramework> TargetFrameworks { get; set; } = new List<TargetFramework>();
     }
 }

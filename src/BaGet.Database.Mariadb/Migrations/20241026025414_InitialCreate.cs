@@ -23,14 +23,14 @@ namespace BaGet.Database.Mariadb.Migrations
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Id = table.Column<string>(type: "varchar(128)", maxLength: 128, nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    Authors = table.Column<string>(type: "longtext", nullable: false)
-                        .Annotation("MySql:CharSet", "utf8mb4"),
                     Description = table.Column<string>(type: "text", nullable: false)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Downloads = table.Column<long>(type: "bigint", nullable: false),
                     HasReadme = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     HasEmbeddedIcon = table.Column<bool>(type: "tinyint(1)", nullable: false),
                     IsPrerelease = table.Column<bool>(type: "tinyint(1)", nullable: false),
+                    Authors = table.Column<string>(type: "longtext", nullable: false)
+                        .Annotation("MySql:CharSet", "utf8mb4"),
                     ReleaseNotes = table.Column<string>(type: "text", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Language = table.Column<string>(type: "varchar(20)", maxLength: 20, nullable: false)
@@ -81,7 +81,7 @@ namespace BaGet.Database.Mariadb.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     TargetFramework = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    PackageKey = table.Column<int>(type: "int", nullable: true)
+                    PackageKey = table.Column<int>(type: "int", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -90,7 +90,8 @@ namespace BaGet.Database.Mariadb.Migrations
                         name: "FK_PackageDependencies_Packages_PackageKey",
                         column: x => x.PackageKey,
                         principalTable: "Packages",
-                        principalColumn: "Key");
+                        principalColumn: "Key",
+                        onDelete: ReferentialAction.Cascade);
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 
@@ -126,7 +127,7 @@ namespace BaGet.Database.Mariadb.Migrations
                         .Annotation("MySql:ValueGenerationStrategy", MySqlValueGenerationStrategy.IdentityColumn),
                     Moniker = table.Column<string>(type: "varchar(256)", maxLength: 256, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    PackageKey = table.Column<int>(type: "int", nullable: false)
+                    PackageKey = table.Column<int>(type: "int", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -135,8 +136,7 @@ namespace BaGet.Database.Mariadb.Migrations
                         name: "FK_TargetFrameworks_Packages_PackageKey",
                         column: x => x.PackageKey,
                         principalTable: "Packages",
-                        principalColumn: "Key",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Key");
                 })
                 .Annotation("MySql:CharSet", "utf8mb4");
 

@@ -12,6 +12,6 @@ namespace BaGet.Core.Indexing
         /// </summary>
         /// <param name="framework">The input framework.</param>
         /// <returns>The list of compatible frameworks.</returns>
-        IReadOnlyList<string> FindAllCompatibleFrameworks(string framework);
+        IEnumerable<string> FindAllCompatibleFrameworks(string framework);
     }
 }

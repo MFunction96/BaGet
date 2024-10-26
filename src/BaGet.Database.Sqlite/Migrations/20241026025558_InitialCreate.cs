@@ -18,12 +18,12 @@ namespace BaGet.Database.Sqlite.Migrations
                     Key = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Id = table.Column<string>(type: "TEXT", maxLength: 128, nullable: false),
-                    Authors = table.Column<string>(type: "TEXT", nullable: false),
                     Description = table.Column<string>(type: "text", nullable: false),
                     Downloads = table.Column<long>(type: "INTEGER", nullable: false),
                     HasReadme = table.Column<bool>(type: "INTEGER", nullable: false),
                     HasEmbeddedIcon = table.Column<bool>(type: "INTEGER", nullable: false),
                     IsPrerelease = table.Column<bool>(type: "INTEGER", nullable: false),
+                    Authors = table.Column<string>(type: "TEXT", nullable: false),
                     ReleaseNotes = table.Column<string>(type: "text", nullable: true),
                     Language = table.Column<string>(type: "TEXT", maxLength: 20, nullable: false),
                     Listed = table.Column<bool>(type: "INTEGER", nullable: false),
@@ -57,7 +57,7 @@ namespace BaGet.Database.Sqlite.Migrations
                     Id = table.Column<string>(type: "TEXT", maxLength: 128, nullable: true),
                     VersionRange = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
                     TargetFramework = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    PackageKey = table.Column<int>(type: "INTEGER", nullable: true)
+                    PackageKey = table.Column<int>(type: "INTEGER", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -66,7 +66,8 @@ namespace BaGet.Database.Sqlite.Migrations
                         name: "FK_PackageDependencies_Packages_PackageKey",
                         column: x => x.PackageKey,
                         principalTable: "Packages",
-                        principalColumn: "Key");
+                        principalColumn: "Key",
+                        onDelete: ReferentialAction.Cascade);
                 });
 
             migrationBuilder.CreateTable(
@@ -97,7 +98,7 @@ namespace BaGet.Database.Sqlite.Migrations
                     Key = table.Column<int>(type: "INTEGER", nullable: false)
                         .Annotation("Sqlite:Autoincrement", true),
                     Moniker = table.Column<string>(type: "TEXT", maxLength: 256, nullable: true),
-                    PackageKey = table.Column<int>(type: "INTEGER", nullable: false)
+                    PackageKey = table.Column<int>(type: "INTEGER", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -106,8 +107,7 @@ namespace BaGet.Database.Sqlite.Migrations
                         name: "FK_TargetFrameworks_Packages_PackageKey",
                         column: x => x.PackageKey,
                         principalTable: "Packages",
-                        principalColumn: "Key",
-                        onDelete: ReferentialAction.Cascade);
+                        principalColumn: "Key");
                 });
 
             migrationBuilder.CreateIndex(

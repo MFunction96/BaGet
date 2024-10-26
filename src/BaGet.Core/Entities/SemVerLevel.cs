@@ -1,4 +1,4 @@
-namespace BaGet.Core
+namespace BaGet.Core.Entities
 {
     public enum SemVerLevel
     {

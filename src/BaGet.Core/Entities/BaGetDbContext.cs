@@ -1,4 +1,5 @@
 using Microsoft.EntityFrameworkCore;
+using System.Reflection.Emit;
 
 namespace BaGet.Core.Entities
 {
@@ -25,7 +26,25 @@ namespace BaGet.Core.Entities
         {
             builder.Entity<Package>(e =>
                 e.HasIndex(p => new { p.Id, p.NormalizedVersionString })
-                    .IsUnique());
+                .IsUnique());
+
+            builder.Entity<Package>()
+                .HasMany(p => p.Dependencies)
+                .WithOne(pd => pd.Package)
+                .HasForeignKey(pd => pd.PackageKey)
+                .IsRequired();
+
+            builder.Entity<Package>()
+                .HasMany(p => p.PackageTypes)
+                .WithOne(pt => pt.Package)
+                .HasForeignKey(pt => pt.PackageKey)
+                .IsRequired();
+
+            builder.Entity<Package>()
+                .HasMany(p => p.TargetFrameworks)
+                .WithOne(pt => pt.Package)
+                .HasForeignKey(pt => pt.PackageKey)
+                .IsRequired(false);
         }
     }
 }

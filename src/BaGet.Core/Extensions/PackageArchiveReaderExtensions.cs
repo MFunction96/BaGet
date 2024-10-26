@@ -52,7 +52,7 @@ namespace BaGet.Core
             {
                 Id = nuspec.GetId(),
                 Version = nuspec.GetVersion(),
-                Authors = ParseAuthors(nuspec.GetAuthors()),
+                Authors = ParseAuthors(nuspec.GetAuthors()).ToList(),
                 Description = nuspec.GetDescription(),
                 HasReadme = packageReader.HasReadme(),
                 HasEmbeddedIcon = packageReader.HasEmbeddedIcon(),
@@ -72,7 +72,7 @@ namespace BaGet.Core
                 RepositoryUrl = repositoryUri,
                 RepositoryType = repositoryType ?? string.Empty,
                 Dependencies = GetDependencies(nuspec),
-                Tags = ParseTags(nuspec.GetTags()),
+                Tags = ParseTags(nuspec.GetTags()).ToList(),
                 PackageTypes = GetPackageTypes(nuspec),
                 TargetFrameworks = GetTargetFrameworks(packageReader),
             };

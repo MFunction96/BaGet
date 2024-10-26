@@ -1,18 +1,20 @@
-using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
-using BaGet.Core.Entities;
+using Microsoft.EntityFrameworkCore;
 
-namespace BaGet.Core
+namespace BaGet.Core.Entities
 {
     [Index(nameof(Moniker))]
-    public class TargetFramework
+    public class TargetFramework : IEntity
     {
         [Key]
         public int Key { get; set; }
+
         [Unicode]
         [MaxLength(BaGetDbContext.MaxTargetFrameworkLength)]
         public string? Moniker { get; set; }
 
-        public Package Package { get; set; } = null!;
+        public int? PackageKey { get; set; }
+
+        public Package? Package { get; set; }
     }
 }

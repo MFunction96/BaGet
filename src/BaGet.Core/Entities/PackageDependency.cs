@@ -1,12 +1,11 @@
 using Microsoft.EntityFrameworkCore;
 using System.ComponentModel.DataAnnotations;
-using BaGet.Core.Entities;
 
-namespace BaGet.Core
+namespace BaGet.Core.Entities
 {
-    // See NuGetGallery.Core's: https://github.com/NuGet/NuGetGallery/blob/master/src/NuGetGallery.Core/Entities/PackageDependency.cs
+    // See NuGet.Services.Entities' : https://github.com/NuGet/NuGetGallery/blob/main/src/NuGet.Services.Entities/PackageDependency.cs
     [Index(nameof(Id))]
-    public class PackageDependency
+    public class PackageDependency : IEntity
     {
         [Key]
         public int Key { get; set; }
@@ -29,6 +28,8 @@ namespace BaGet.Core
         [MaxLength(BaGetDbContext.MaxTargetFrameworkLength)]
         public string? TargetFramework { get; set; }
 
-        public Package? Package { get; set; }
+        public int PackageKey { get; set; }
+
+        public Package Package { get; set; } = null!;
     }
 }
