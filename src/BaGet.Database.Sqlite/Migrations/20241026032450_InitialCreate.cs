@@ -37,7 +37,7 @@ namespace BaGet.Database.Sqlite.Migrations
                     LicenseUrl = table.Column<string>(type: "TEXT", nullable: true),
                     ProjectUrl = table.Column<string>(type: "TEXT", nullable: true),
                     RepositoryUrl = table.Column<string>(type: "TEXT", nullable: true),
-                    RepositoryType = table.Column<string>(type: "TEXT", maxLength: 100, nullable: false),
+                    RepositoryType = table.Column<string>(type: "TEXT", maxLength: 100, nullable: true),
                     Tags = table.Column<string>(type: "TEXT", nullable: true),
                     RowVersion = table.Column<Guid>(type: "TEXT", nullable: false),
                     Version = table.Column<string>(type: "TEXT", maxLength: 64, nullable: false),

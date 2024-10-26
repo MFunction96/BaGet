@@ -23,6 +23,6 @@ namespace BaGet.Protocol.Models
         /// The packages that matched the search query.
         /// </summary>
         [JsonPropertyName("data")]
-        public IReadOnlyList<SearchResult>? Data { get; set; }
+        public IEnumerable<SearchResult>? Data { get; set; }
     }
 }

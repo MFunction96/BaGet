@@ -96,7 +96,6 @@ namespace BaGet.Database.Sqlite.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("RepositoryType")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .IsUnicode(true)
                         .HasColumnType("TEXT");

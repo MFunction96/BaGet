@@ -70,7 +70,7 @@ namespace BaGet.Core
                 LicenseUrl = ParseUri(nuspec.GetLicenseUrl()),
                 ProjectUrl = ParseUri(nuspec.GetProjectUrl()),
                 RepositoryUrl = repositoryUri,
-                RepositoryType = repositoryType ?? string.Empty,
+                RepositoryType = repositoryType,
                 Dependencies = GetDependencies(nuspec),
                 Tags = ParseTags(nuspec.GetTags()).ToList(),
                 PackageTypes = GetPackageTypes(nuspec),

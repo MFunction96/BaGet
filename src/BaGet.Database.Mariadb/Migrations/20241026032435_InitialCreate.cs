@@ -53,7 +53,7 @@ namespace BaGet.Database.Mariadb.Migrations
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     RepositoryUrl = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
-                    RepositoryType = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: false)
+                    RepositoryType = table.Column<string>(type: "varchar(100)", maxLength: 100, nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),
                     Tags = table.Column<string>(type: "longtext", nullable: true)
                         .Annotation("MySql:CharSet", "utf8mb4"),

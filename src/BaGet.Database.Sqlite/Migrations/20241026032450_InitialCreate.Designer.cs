@@ -3,40 +3,33 @@ using System;
 using BaGet.Core.Entities;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Infrastructure;
-using Microsoft.EntityFrameworkCore.Metadata;
 using Microsoft.EntityFrameworkCore.Migrations;
 using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 
 #nullable disable
 
-namespace BaGet.Database.Mariadb.Migrations
+namespace BaGet.Database.Sqlite.Migrations
 {
     [DbContext(typeof(BaGetDbContext))]
-    [Migration("20241026025414_InitialCreate")]
+    [Migration("20241026032450_InitialCreate")]
     partial class InitialCreate
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
         {
 #pragma warning disable 612, 618
-            modelBuilder
-                .HasAnnotation("ProductVersion", "8.0.10")
-                .HasAnnotation("Relational:MaxIdentifierLength", 64);
-
-            MySqlModelBuilderExtensions.AutoIncrementColumns(modelBuilder);
+            modelBuilder.HasAnnotation("ProductVersion", "8.0.10");
 
             modelBuilder.Entity("BaGet.Core.Entities.Package", b =>
                 {
                     b.Property<int>("Key")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Key"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Authors")
                         .IsRequired()
                         .IsUnicode(true)
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Description")
                         .IsRequired()
@@ -44,85 +37,84 @@ namespace BaGet.Database.Mariadb.Migrations
                         .HasColumnType("text");
 
                     b.Property<long>("Downloads")
-                        .HasColumnType("bigint");
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("HasEmbeddedIcon")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("INTEGER");
 
                     b.Property<bool>("HasReadme")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("IconUrl")
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Id")
                         .IsRequired()
                         .HasMaxLength(128)
                         .IsUnicode(true)
-                        .HasColumnType("varchar(128)");
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("IsPrerelease")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Language")
                         .IsRequired()
                         .HasMaxLength(20)
                         .IsUnicode(true)
-                        .HasColumnType("varchar(20)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("LicenseUrl")
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("Listed")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("MinClientVersion")
                         .IsRequired()
                         .HasMaxLength(44)
                         .IsUnicode(true)
-                        .HasColumnType("varchar(44)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("NormalizedVersionString")
                         .IsRequired()
                         .HasMaxLength(64)
                         .IsUnicode(true)
-                        .HasColumnType("varchar(64)")
+                        .HasColumnType("TEXT")
                         .HasColumnName("Version");
 
                     b.Property<string>("OriginalVersionString")
                         .HasMaxLength(64)
                         .IsUnicode(true)
-                        .HasColumnType("varchar(64)")
+                        .HasColumnType("TEXT")
                         .HasColumnName("OriginalVersion");
 
                     b.Property<string>("ProjectUrl")
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
                     b.Property<DateTime>("Published")
-                        .HasColumnType("datetime(6)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("ReleaseNotes")
                         .IsUnicode(true)
                         .HasColumnType("text");
 
                     b.Property<string>("RepositoryType")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .IsUnicode(true)
-                        .HasColumnType("varchar(100)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("RepositoryUrl")
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
                     b.Property<bool>("RequireLicenseAcceptance")
-                        .HasColumnType("tinyint(1)");
+                        .HasColumnType("INTEGER");
 
                     b.Property<Guid>("RowVersion")
                         .IsConcurrencyToken()
-                        .HasColumnType("char(36)");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("SemVerLevel")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Summary")
                         .IsRequired()
@@ -131,13 +123,13 @@ namespace BaGet.Database.Mariadb.Migrations
 
                     b.Property<string>("Tags")
                         .IsUnicode(true)
-                        .HasColumnType("longtext");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("Title")
                         .IsRequired()
                         .HasMaxLength(256)
                         .IsUnicode(true)
-                        .HasColumnType("varchar(256)");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Key");
 
@@ -153,27 +145,25 @@ namespace BaGet.Database.Mariadb.Migrations
                 {
                     b.Property<int>("Key")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Key"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Id")
                         .HasMaxLength(128)
                         .IsUnicode(true)
-                        .HasColumnType("varchar(128)");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("PackageKey")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("TargetFramework")
                         .HasMaxLength(256)
                         .IsUnicode(true)
-                        .HasColumnType("varchar(256)");
+                        .HasColumnType("TEXT");
 
                     b.Property<string>("VersionRange")
                         .HasMaxLength(256)
                         .IsUnicode(true)
-                        .HasColumnType("varchar(256)");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Key");
 
@@ -188,22 +178,20 @@ namespace BaGet.Database.Mariadb.Migrations
                 {
                     b.Property<int>("Key")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Key"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Name")
                         .HasMaxLength(512)
                         .IsUnicode(true)
-                        .HasColumnType("varchar(512)");
+                        .HasColumnType("TEXT");
 
                     b.Property<int>("PackageKey")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Version")
                         .HasMaxLength(64)
                         .IsUnicode(true)
-                        .HasColumnType("varchar(64)");
+                        .HasColumnType("TEXT");
 
                     b.HasKey("Key");
 
@@ -218,17 +206,15 @@ namespace BaGet.Database.Mariadb.Migrations
                 {
                     b.Property<int>("Key")
                         .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    MySqlPropertyBuilderExtensions.UseMySqlIdentityColumn(b.Property<int>("Key"));
+                        .HasColumnType("INTEGER");
 
                     b.Property<string>("Moniker")
                         .HasMaxLength(256)
                         .IsUnicode(true)
-                        .HasColumnType("varchar(256)");
+                        .HasColumnType("TEXT");
 
                     b.Property<int?>("PackageKey")
-                        .HasColumnType("int");
+                        .HasColumnType("INTEGER");
 
                     b.HasKey("Key");
 

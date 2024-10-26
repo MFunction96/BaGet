@@ -103,7 +103,6 @@ namespace BaGet.Database.Mariadb.Migrations
                         .HasColumnType("text");
 
                     b.Property<string>("RepositoryType")
-                        .IsRequired()
                         .HasMaxLength(100)
                         .IsUnicode(true)
                         .HasColumnType("varchar(100)");

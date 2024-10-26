@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.ComponentModel.DataAnnotations;
 using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
 // ReSharper disable EntityFramework.ModelValidation.UnlimitedStringLength
 
@@ -13,8 +14,11 @@ namespace BaGet.Core.Entities
     [Index(nameof(Id))]
     public class Package : IEntity
     {
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ICollection<PackageDependency> Dependencies { get; set; } = new HashSet<PackageDependency>();
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ICollection<PackageType> PackageTypes { get; set; } = new HashSet<PackageType>();
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
         public ICollection<TargetFramework> TargetFrameworks { get; set; } = new HashSet<TargetFramework>();
 
         [Key]
@@ -75,7 +79,8 @@ namespace BaGet.Core.Entities
         public Uri? RepositoryUrl { get; set; }
         [Unicode]
         [MaxLength(BaGetDbContext.MaxRepositoryTypeLength)]
-        public string RepositoryType { get; set; } = string.Empty;
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? RepositoryType { get; set; }
 
         [Unicode]
         public List<string>? Tags { get; set; }
@@ -85,7 +90,7 @@ namespace BaGet.Core.Entities
         /// </summary>
         [ConcurrencyCheck]
         public Guid RowVersion { get; set; } = Guid.NewGuid();
-        
+
         [Column("Version")]
         [Unicode]
         [Required]

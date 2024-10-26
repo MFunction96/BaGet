@@ -32,13 +32,10 @@ namespace BaGet.Core.Search
 
             search = search.ApplySearchFilters(request.IncludePrerelease, request.IncludeSemVer2, request.PackageType, frameworks);
 
-            var results = await context.Packages.ToArrayAsync(cancellationToken);
-
-            var groupedResults = results
+            var groupedResults = await search
                 .GroupBy(p => p.Id)
                 .Select(group => new PackageRegistration(group.Key, group.ToArray()))
-                .AsEnumerable()
-                .ToList();
+                .ToListAsync(cancellationToken);
 
             return searchBuilder.BuildSearch(groupedResults);
         }

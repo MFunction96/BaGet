@@ -17,7 +17,8 @@ namespace BaGet.Core
         public bool HasReadme { get; set; }
 
         [JsonPropertyName("packageTypes")]
-        public IReadOnlyList<string>? PackageTypes { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public IEnumerable<string>? PackageTypes { get; set; }
 
         /// <summary>
         /// The package's release notes.
@@ -29,6 +30,7 @@ namespace BaGet.Core
         public string RepositoryUrl { get; set; }
 
         [JsonPropertyName("repositoryType")]
-        public string RepositoryType { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? RepositoryType { get; set; }
     }
 }

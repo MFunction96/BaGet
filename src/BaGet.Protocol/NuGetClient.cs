@@ -1,3 +1,5 @@
+using BaGet.Protocol.Models;
+using NuGet.Versioning;
 using System;
 using System.Collections.Generic;
 using System.IO;
@@ -6,8 +8,6 @@ using System.Net;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using BaGet.Protocol.Models;
-using NuGet.Versioning;
 
 namespace BaGet.Protocol
 {
@@ -178,7 +178,7 @@ namespace BaGet.Protocol
         /// <param name="includeUnlisted">Whether to include unlisted versions.</param>
         /// <param name="cancellationToken">A token to cancel the task.</param>
         /// <returns>The package's versions, or an empty list if the package does not exist.</returns>
-        public virtual async Task<IReadOnlyList<NuGetVersion>> ListPackageVersionsAsync(
+        public virtual async Task<IEnumerable<NuGetVersion>> ListPackageVersionsAsync(
             string packageId,
             bool includeUnlisted,
             CancellationToken cancellationToken = default)
@@ -204,7 +204,7 @@ namespace BaGet.Protocol
         /// <param name="packageId">The package ID.</param>
         /// <param name="cancellationToken">A token to cancel the task.</param>
         /// <returns>The package's metadata, or an empty list if the package does not exist.</returns>
-        public virtual async Task<IReadOnlyList<PackageMetadata>> GetPackageMetadataAsync(
+        public virtual async Task<IEnumerable<PackageMetadata>> GetPackageMetadataAsync(
             string packageId,
             CancellationToken cancellationToken = default)
         {
@@ -310,7 +310,7 @@ namespace BaGet.Protocol
         /// </param>
         /// <param name="cancellationToken">A token to cancel the task.</param>
         /// <returns>The search results, including prerelease packages.</returns>
-        public virtual async Task<IReadOnlyList<SearchResult>> SearchAsync(
+        public virtual async Task<IEnumerable<SearchResult>?> SearchAsync(
             string query = null,
             CancellationToken cancellationToken = default)
         {
@@ -329,7 +329,7 @@ namespace BaGet.Protocol
         /// <param name="take">The number of results to include.</param>
         /// <param name="cancellationToken">A token to cancel the task.</param>
         /// <returns>The search results, including prerelease packages.</returns>
-        public virtual async Task<IReadOnlyList<SearchResult>> SearchAsync(
+        public virtual async Task<IEnumerable<SearchResult>?> SearchAsync(
             string query,
             int skip,
             int take,
@@ -355,7 +355,7 @@ namespace BaGet.Protocol
         /// <param name="includePrerelease">Whether to include prerelease packages.</param>
         /// <param name="cancellationToken">A token to cancel the task.</param>
         /// <returns>The search results.</returns>
-        public virtual async Task<IReadOnlyList<SearchResult>> SearchAsync(
+        public virtual async Task<IEnumerable<SearchResult>> SearchAsync(
             string query,
             bool includePrerelease,
             CancellationToken cancellationToken = default)
@@ -379,7 +379,7 @@ namespace BaGet.Protocol
         /// <param name="includePrerelease">Whether to include prerelease packages.</param>
         /// <param name="cancellationToken">A token to cancel the task.</param>
         /// <returns>The search results, including prerelease packages.</returns>
-        public virtual async Task<IReadOnlyList<SearchResult>> SearchAsync(
+        public virtual async Task<IEnumerable<SearchResult>?> SearchAsync(
             string query,
             int skip,
             int take,
@@ -405,7 +405,7 @@ namespace BaGet.Protocol
         /// </param>
         /// <param name="cancellationToken">A token to cancel the task.</param>
         /// <returns>The package IDs that matched the query.</returns>
-        public virtual async Task<IReadOnlyList<string>> AutocompleteAsync(
+        public virtual async Task<IEnumerable<string>> AutocompleteAsync(
             string query = null,
             CancellationToken cancellationToken = default)
         {
@@ -424,7 +424,7 @@ namespace BaGet.Protocol
         /// <param name="take">The number of results to include.</param>
         /// <param name="cancellationToken">A token to cancel the task.</param>
         /// <returns>The package IDs that matched the query.</returns>
-        public virtual async Task<IReadOnlyList<string>> AutocompleteAsync(
+        public virtual async Task<IEnumerable<string>> AutocompleteAsync(
             string query,
             int skip,
             int take,
@@ -450,7 +450,7 @@ namespace BaGet.Protocol
         /// <param name="includePrerelease">Whether to include prerelease packages.</param>
         /// <param name="cancellationToken">A token to cancel the task.</param>
         /// <returns>The package IDs that matched the query.</returns>
-        public virtual async Task<IReadOnlyList<string>> AutocompleteAsync(
+        public virtual async Task<IEnumerable<string>> AutocompleteAsync(
             string query,
             bool includePrerelease,
             CancellationToken cancellationToken = default)
@@ -474,7 +474,7 @@ namespace BaGet.Protocol
         /// <param name="includePrerelease">Whether to include prerelease packages.</param>
         /// <param name="cancellationToken">A token to cancel the task.</param>
         /// <returns>The package IDs that matched the query.</returns>
-        public virtual async Task<IReadOnlyList<string>> AutocompleteAsync(
+        public virtual async Task<IEnumerable<string>> AutocompleteAsync(
             string query,
             int skip,
             int take,
