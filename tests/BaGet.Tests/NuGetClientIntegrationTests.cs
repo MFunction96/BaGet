@@ -143,9 +143,9 @@ namespace BaGet.Tests
         [Fact]
         public async Task VersionListReturnsResults()
         {
-            await _app.AddPackageAsync(_packageStream);
+            await _app.AddPackageAsync(_packageStream, cancellationToken: _cancellationToken);
 
-            var resource = await _repository.GetResourceAsync<FindPackageByIdResource>();
+            var resource = await _repository.GetResourceAsync<FindPackageByIdResource>(_cancellationToken);
             var versions = await resource.GetAllVersionsAsync(
                 "TestData",
                 _cache,
@@ -219,9 +219,9 @@ namespace BaGet.Tests
         [Fact]
         public async Task PackageMetadataReturnsOk()
         {
-            await _app.AddPackageAsync(_packageStream);
+            await _app.AddPackageAsync(_packageStream, cancellationToken: _cancellationToken);
 
-            var resource = await _repository.GetResourceAsync<PackageMetadataResource>();
+            var resource = await _repository.GetResourceAsync<PackageMetadataResource>(_cancellationToken);
             var packages = await resource.GetMetadataAsync(
                 "TestData",
                 includePrerelease: true,

@@ -59,11 +59,9 @@ namespace BaGet.Core
             return await db.FindOrNullAsync(id, version, includeUnlisted: true, cancellationToken);
         }
 
-        public Task<bool> ExistsAsync(string id, NuGetVersion version, CancellationToken cancellationToken)
+        public async Task<bool> ExistsAsync(string id, NuGetVersion version, CancellationToken cancellationToken)
         {
-            // TODO: Implement this
-            return Task.FromResult(false);
-            //return await MirrorAsync(id, version, cancellationToken);
+            return await MirrorAsync(id, version, cancellationToken);
         }
 
         public async Task AddDownloadAsync(string packageId, NuGetVersion version, CancellationToken cancellationToken)
@@ -78,15 +76,15 @@ namespace BaGet.Core
         /// <param name="version">The package version to index from an upstream.</param>
         /// <param name="cancellationToken"></param>
         /// <returns>True if the package exists locally or was indexed from an upstream source.</returns>
-        private Task<bool> MirrorAsync(string id, NuGetVersion version, CancellationToken cancellationToken)
+        private async Task<bool> MirrorAsync(string id, NuGetVersion version, CancellationToken cancellationToken)
         {
-            throw new NotImplementedException();
-            //if (await _db.ExistsAsync(id, version, cancellationToken))
+            return await db.ExistsAsync(id, version, cancellationToken);
+            //if (await db.ExistsAsync(id, version, cancellationToken))
             //{
             //    return true;
             //}
 
-            //_logger.LogInformation(
+            //logger.LogInformation(
             //    "Package {PackageId} {PackageVersion} does not exist locally. Checking upstream feed...",
             //    id,
             //    version);

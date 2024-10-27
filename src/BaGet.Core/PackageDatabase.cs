@@ -34,7 +34,7 @@ namespace BaGet.Core
         {
             return await context
                 .Packages
-                .Where(p => p.Id == id)
+                .Where(p => p.Id.ToLower() == id.ToLower())
                 .AnyAsync(cancellationToken);
         }
 
@@ -42,7 +42,7 @@ namespace BaGet.Core
         {
             return await context
                 .Packages
-                .Where(p => p.Id == id)
+                .Where(p => p.Id.ToLower() == id.ToLower())
                 .Where(p => p.NormalizedVersionString == version.ToNormalizedString())
                 .AnyAsync(cancellationToken);
         }
@@ -53,7 +53,7 @@ namespace BaGet.Core
                 .Include(p => p.Dependencies)
                 .Include(p => p.PackageTypes)
                 .Include(p => p.TargetFrameworks)
-                .Where(p => p.Id == id);
+                .Where(p => p.Id.ToLower() == id.ToLower());
 
             if (!includeUnlisted)
             {
@@ -72,7 +72,7 @@ namespace BaGet.Core
             var query = context.Packages
                 .Include(p => p.Dependencies)
                 .Include(p => p.TargetFrameworks)
-                .Where(p => p.Id == id)
+                .Where(p => p.Id.ToLower() == id.ToLower())
                 .Where(p => p.NormalizedVersionString == version.ToNormalizedString());
 
             if (!includeUnlisted)
