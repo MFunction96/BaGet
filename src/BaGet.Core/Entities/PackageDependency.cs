@@ -1,22 +1,35 @@
-namespace BaGet.Core
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+
+namespace BaGet.Core.Entities
 {
-    // See NuGetGallery.Core's: https://github.com/NuGet/NuGetGallery/blob/master/src/NuGetGallery.Core/Entities/PackageDependency.cs
-    public class PackageDependency
+    // See NuGet.Services.Entities' : https://github.com/NuGet/NuGetGallery/blob/main/src/NuGet.Services.Entities/PackageDependency.cs
+    [Index(nameof(Id))]
+    public class PackageDependency : IEntity
     {
+        [Key]
         public int Key { get; set; }
 
         /// <summary>
         /// The dependency's package ID. Null if this is a dependency group without any dependencies.
         /// </summary>
-        public string Id { get; set; }
+        [Unicode]
+        [MaxLength(BaGetDbContext.MaxPackageIdLength)]
+        public string? Id { get; set; }
 
         /// <summary>
         /// The dependency's package version. Null if this is a dependency group without any dependencies.
         /// </summary>
-        public string VersionRange { get; set; }
+        [Unicode]
+        [MaxLength(BaGetDbContext.MaxPackageDependencyVersionRangeLength)]
+        public string? VersionRange { get; set; }
 
-        public string TargetFramework { get; set; }
+        [Unicode]
+        [MaxLength(BaGetDbContext.MaxTargetFrameworkLength)]
+        public string? TargetFramework { get; set; }
 
-        public Package Package { get; set; }
+        public int PackageKey { get; set; }
+
+        public Package Package { get; set; } = null!;
     }
 }

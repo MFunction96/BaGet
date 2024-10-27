@@ -15,7 +15,7 @@ namespace BaGet.Protocol
         /// </summary>
         /// <param name="response">The package versions response.</param>
         /// <returns>The package versions.</returns>
-        public static IReadOnlyList<NuGetVersion> ParseVersions(this PackageVersionsResponse response)
+        public static IEnumerable<NuGetVersion> ParseVersions(this PackageVersionsResponse response)
         {
             return response
                 .Versions

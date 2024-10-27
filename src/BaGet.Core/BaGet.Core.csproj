@@ -11,6 +11,8 @@
     <PackageReference Include="Microsoft.Extensions.DependencyInjection.Abstractions" Version="$(DotNetMajorVersion)" />
     <PackageReference Include="Microsoft.Extensions.Options.ConfigurationExtensions" Version="$(DotNetMajorVersion)" />
     <PackageReference Include="NuGet.Protocol" Version="*" />
+    <PackageReference Include="Skidbladnir.IO.File" Version="1.2.6" />
+    <PackageReference Include="System.Linq.Dynamic.Core" Version="*" />
     <PackageReference Include="System.Reflection.Metadata" Version="$(DotNetMajorVersion)" />
   </ItemGroup>
 

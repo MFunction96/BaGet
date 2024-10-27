@@ -1,19 +1,14 @@
 using System;
 using System.Collections.Generic;
 using System.Linq;
+using BaGet.Core.Entities;
+using BaGet.Core.Metadata;
 using BaGet.Protocol.Models;
 
 namespace BaGet.Core
 {
-    public class RegistrationBuilder
+    public class RegistrationBuilder(IUrlGenerator url)
     {
-        private readonly IUrlGenerator _url;
-
-        public RegistrationBuilder(IUrlGenerator url)
-        {
-            _url = url ?? throw new ArgumentNullException(nameof(url));
-        }
-
         public virtual BaGetRegistrationIndexResponse BuildIndex(PackageRegistration registration)
         {
             var sortedPackages = registration.Packages.OrderBy(p => p.Version).ToList();
@@ -23,21 +18,21 @@ namespace BaGet.Core
             // Paged example: https://api.nuget.org/v3/registration3/fake/index.json
             return new BaGetRegistrationIndexResponse
             {
-                RegistrationIndexUrl = _url.GetRegistrationIndexUrl(registration.PackageId),
+                RegistrationIndexUrl = url.GetRegistrationIndexUrl(registration.PackageId),
                 Type = RegistrationIndexResponse.DefaultType,
                 Count = 1,
                 TotalDownloads = registration.Packages.Sum(p => p.Downloads),
-                Pages = new[]
-                {
+                Pages =
+                [
                     new BaGetRegistrationIndexPage
                     {
-                        RegistrationPageUrl = _url.GetRegistrationIndexUrl(registration.PackageId),
+                        RegistrationPageUrl = url.GetRegistrationIndexUrl(registration.PackageId),
                         Count = registration.Packages.Count(),
                         Lower = sortedPackages.First().Version.ToNormalizedString().ToLowerInvariant(),
                         Upper = sortedPackages.Last().Version.ToNormalizedString().ToLowerInvariant(),
                         ItemsOrNull = sortedPackages.Select(ToRegistrationIndexPageItem).ToList(),
                     }
-                }
+                ]
             };
         }
 
@@ -51,17 +46,17 @@ namespace BaGet.Core
                 Type = RegistrationLeafResponse.DefaultType,
                 Listed = package.Listed,
                 Published = package.Published,
-                RegistrationLeafUrl = _url.GetRegistrationLeafUrl(id, version),
-                PackageContentUrl = _url.GetPackageDownloadUrl(id, version),
-                RegistrationIndexUrl = _url.GetRegistrationIndexUrl(id)
+                RegistrationLeafUrl = url.GetRegistrationLeafUrl(id, version),
+                PackageContentUrl = url.GetPackageDownloadUrl(id, version),
+                RegistrationIndexUrl = url.GetRegistrationIndexUrl(id)
             };
         }
 
         private BaGetRegistrationIndexPageItem ToRegistrationIndexPageItem(Package package) =>
             new BaGetRegistrationIndexPageItem
             {
-                RegistrationLeafUrl = _url.GetRegistrationLeafUrl(package.Id, package.Version),
-                PackageContentUrl = _url.GetPackageDownloadUrl(package.Id, package.Version),
+                RegistrationLeafUrl = url.GetRegistrationLeafUrl(package.Id, package.Version),
+                PackageContentUrl = url.GetPackageDownloadUrl(package.Id, package.Version),
                 PackageMetadata = new BaGetPackageMetadata
                 {
                     PackageId = package.Id,
@@ -71,28 +66,28 @@ namespace BaGet.Core
                     Downloads = package.Downloads,
                     HasReadme = package.HasReadme,
                     IconUrl = package.HasEmbeddedIcon
-                        ? _url.GetPackageIconDownloadUrl(package.Id, package.Version)
-                        : package.IconUrlString,
+                        ? url.GetPackageIconDownloadUrl(package.Id, package.Version)
+                        : (package.IconUrl?.AbsoluteUri ?? string.Empty),
                     Language = package.Language,
-                    LicenseUrl = package.LicenseUrlString,
+                    LicenseUrl = (package.LicenseUrl?.AbsoluteUri ?? string.Empty),
                     Listed = package.Listed,
                     MinClientVersion = package.MinClientVersion,
-                    ReleaseNotes = package.ReleaseNotes,
-                    PackageContentUrl = _url.GetPackageDownloadUrl(package.Id, package.Version),
-                    PackageTypes = package.PackageTypes.Select(t => t.Name).ToList(),
-                    ProjectUrl = package.ProjectUrlString,
-                    RepositoryUrl = package.RepositoryUrlString,
+                    ReleaseNotes = package.ReleaseNotes ?? string.Empty,
+                    PackageContentUrl = url.GetPackageDownloadUrl(package.Id, package.Version),
+                    PackageTypes = package.PackageTypes.Where(t => !string.IsNullOrEmpty(t.Name)).Select(t => t.Name!).ToList(),
+                    ProjectUrl = (package.ProjectUrl?.AbsoluteUri ?? string.Empty),
+                    RepositoryUrl = package.RepositoryUrl?.AbsoluteUri ?? string.Empty,
                     RepositoryType = package.RepositoryType,
                     Published = package.Published == DateTime.MinValue ? DateTimeOffset.MinValue : package.Published,
                     RequireLicenseAcceptance = package.RequireLicenseAcceptance,
                     Summary = package.Summary,
-                    Tags = package.Tags,
+                    Tags = package.Tags?.ToList() ?? new List<string>(),
                     Title = package.Title,
                     DependencyGroups = ToDependencyGroups(package)
                 },
             };
 
-        private IReadOnlyList<DependencyGroupItem> ToDependencyGroups(Package package)
+        private IEnumerable<DependencyGroupItem> ToDependencyGroups(Package package)
         {
             return package.Dependencies
                 .GroupBy(d => d.TargetFramework)

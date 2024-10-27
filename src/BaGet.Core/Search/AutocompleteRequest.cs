@@ -7,7 +7,7 @@ namespace BaGet.Core
     public class AutocompleteRequest
     {
         /// <summary>
-        /// The number of results to skip, for pagination.
+        /// The number of results to pageIndex, for pagination.
         /// </summary>
         public int Skip { get; set; }
 

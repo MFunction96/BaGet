@@ -1,4 +1,5 @@
 using System;
+using System.Linq;
 using System.Threading.Tasks;
 using BaGet.Protocol.Internal;
 using Xunit;
@@ -20,9 +21,9 @@ namespace BaGet.Protocol.Tests
             var result = await _target.GetPackageVersionsOrNullAsync("Test.Package");
 
             Assert.NotNull(result);
-            Assert.Equal(2, result.Versions.Count);
-            Assert.Equal("1.0.0", result.Versions[0]);
-            Assert.Equal("2.0.0", result.Versions[1]);
+            Assert.Equal(2, result.Versions.Count());
+            Assert.Equal("1.0.0", result.Versions.ToArray()[0]);
+            Assert.Equal("2.0.0", result.Versions.ToArray()[1]);
         }
 
         [Fact]

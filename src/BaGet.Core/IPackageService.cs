@@ -1,6 +1,7 @@
 using System.Collections.Generic;
 using System.Threading;
 using System.Threading.Tasks;
+using BaGet.Core.Entities;
 using NuGet.Versioning;
 
 namespace BaGet.Core
@@ -23,7 +24,7 @@ namespace BaGet.Core
         /// The package's versions, or an empty list if the package cannot be found.
         /// This includes unlisted versions.
         /// </returns>
-        Task<IReadOnlyList<NuGetVersion>> FindPackageVersionsAsync(string id, CancellationToken cancellationToken);
+        Task<IEnumerable<NuGetVersion>> FindPackageVersionsAsync(string id, CancellationToken cancellationToken);
 
         /// <summary>
         /// Attempt to find a package's metadata using mirroring. This will merge
@@ -35,7 +36,7 @@ namespace BaGet.Core
         /// The metadata for all versions of a package, including unlisted versions.
         /// Returns an empty list if the package cannot be found.
         /// </returns>
-        Task<IReadOnlyList<Package>> FindPackagesAsync(string id, CancellationToken cancellationToken);
+        Task<IEnumerable<Package>> FindPackagesAsync(string id, CancellationToken cancellationToken);
 
         /// <summary>
         /// Attempt to find a package's metadata using mirroring. This will merge
@@ -48,7 +49,7 @@ namespace BaGet.Core
         /// The metadata for single version of a package.
         /// Returns null if the package does not exist.
         /// </returns>
-        Task<Package> FindPackageOrNullAsync(string id, NuGetVersion version, CancellationToken cancellationToken);
+        Task<Package?> FindPackageOrNullAsync(string id, NuGetVersion version, CancellationToken cancellationToken);
 
         /// <summary>
         /// Determine whether a package exists locally or on the upstream source.

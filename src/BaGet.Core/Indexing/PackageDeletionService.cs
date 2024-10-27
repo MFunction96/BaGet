@@ -1,6 +1,8 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using BaGet.Core.Configuration;
+using BaGet.Core.Storage;
 using Microsoft.Extensions.Logging;
 using Microsoft.Extensions.Options;
 using NuGet.Versioning;
@@ -17,7 +19,7 @@ namespace BaGet.Core
         public PackageDeletionService(
             IPackageDatabase packages,
             IPackageStorageService storage,
-            IOptionsSnapshot<BaGetOptions> options,
+            IOptions<BaGetOptions> options,
             ILogger<PackageDeletionService> logger)
         {
             _packages = packages ?? throw new ArgumentNullException(nameof(packages));

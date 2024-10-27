@@ -25,6 +25,7 @@ namespace BaGet.Protocol.Models
         /// Human readable comments about the resource.
         /// </summary>
         [JsonPropertyName("comment")]
-        public string Comment { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? Comment { get; set; }
     }
 }

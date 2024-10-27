@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using System.IO;
 using System.Text;
 using System.Threading.Tasks;
+using BaGet.Core.Storage;
 using Microsoft.Extensions.Options;
 using Moq;
 using Xunit;
@@ -106,11 +107,11 @@ namespace BaGet.Core.Tests.Services
                 // Arrange
                 var path = Path.Combine(_storePath, "test.txt");
 
-                Directory.CreateDirectory(Path.GetDirectoryName(path));
+                Directory.CreateDirectory(Path.GetDirectoryName(path)!);
                 File.WriteAllText(path, "Hello world");
 
                 StoragePutResult result;
-                using (var content = StringStream("Hello world"))
+                await using (var content = StringStream("Hello world"))
                 {
                     // Act
                     result = await _target.PutAsync("test.txt", content, "text/plain");
@@ -191,13 +192,13 @@ namespace BaGet.Core.Tests.Services
         public class FactsBase : IDisposable
         {
             protected readonly string _storePath;
-            protected readonly Mock<IOptionsSnapshot<FileSystemStorageOptions>> _options;
+            protected readonly Mock<IOptions<FileSystemStorageOptions>> _options;
             protected readonly FileStorageService _target;
 
             public FactsBase()
             {
                 _storePath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString("N"));
-                _options = new Mock<IOptionsSnapshot<FileSystemStorageOptions>>();
+                _options = new Mock<IOptions<FileSystemStorageOptions>>();
 
                 _options
                     .Setup(o => o.Value)

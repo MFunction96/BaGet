@@ -1,19 +1,20 @@
 using System;
 using System.Threading;
 using System.Threading.Tasks;
+using BaGet.Core.Configuration;
 using Microsoft.Extensions.Options;
 
-namespace BaGet.Core
+namespace BaGet.Core.Authentication
 {
     public class ApiKeyAuthenticationService : IAuthenticationService
     {
         private readonly string _apiKey;
 
-        public ApiKeyAuthenticationService(IOptionsSnapshot<BaGetOptions> options)
+        public ApiKeyAuthenticationService(IOptions<BaGetOptions> options)
         {
             if (options == null) throw new ArgumentNullException(nameof(options));
 
-            _apiKey = string.IsNullOrEmpty(options.Value.ApiKey) ? null : options.Value.ApiKey;
+            _apiKey = string.IsNullOrEmpty(options.Value.ApiKey) ? string.Empty : options.Value.ApiKey;
         }
 
         public Task<bool> AuthenticateAsync(string apiKey, CancellationToken cancellationToken)
@@ -22,7 +23,7 @@ namespace BaGet.Core
         private bool Authenticate(string apiKey)
         {
             // No authentication is necessary if there is no required API key.
-            if (_apiKey == null) return true;
+            if (string.IsNullOrEmpty(_apiKey)) return true;
 
             return _apiKey == apiKey;
         }

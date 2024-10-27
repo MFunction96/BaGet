@@ -1,7 +1,7 @@
-using System;
+using BaGet.Core.Entities;
 using System.Collections.Generic;
 
-namespace BaGet.Core
+namespace BaGet.Core.Metadata
 {
     /// <summary>
     /// The information on all versions of a package.
@@ -15,10 +15,10 @@ namespace BaGet.Core
         /// <param name="packages">All versions of the package.</param>
         public PackageRegistration(
             string packageId,
-            IReadOnlyList<Package> packages)
+            IEnumerable<Package> packages)
         {
-            PackageId = packageId ?? throw new ArgumentNullException(nameof(packageId));
-            Packages = packages ?? throw new ArgumentNullException(nameof(packages));
+            PackageId = packageId;
+            Packages = packages;
         }
 
         /// <summary>
@@ -29,6 +29,6 @@ namespace BaGet.Core
         /// <summary>
         /// The information for each version of the package.
         /// </summary>
-        public IReadOnlyList<Package> Packages { get; }
+        public IEnumerable<Package> Packages { get; }
     }
 }

@@ -1,6 +1,4 @@
-using System.ComponentModel.DataAnnotations;
-
-namespace BaGet.Core
+namespace BaGet.Core.Configuration
 {
     public class BaGetOptions
     {
@@ -49,6 +47,7 @@ namespace BaGet.Core
 
         public SearchOptions Search { get; set; }
 
-        public MirrorOptions Mirror { get; set; }
+        // TODO: Reconstruct the Mirror feature.
+        // public MirrorOptions Mirror { get; set; }
     }
 }

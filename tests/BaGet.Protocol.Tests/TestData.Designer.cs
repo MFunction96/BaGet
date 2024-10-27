@@ -170,7 +170,7 @@ namespace BaGet.Protocol.Tests {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to https://test.example/v3/autocomplete?take=20&amp;prerelease=True&amp;semVerLevel=2.0.0.
+        ///   Looks up a localized string similar to https://test.example/v3/autocomplete?pageCount=20&amp;prerelease=True&amp;semVerLevel=2.0.0.
         /// </summary>
         internal static string DefaultAutocompleteUrl {
             get {
@@ -203,7 +203,7 @@ namespace BaGet.Protocol.Tests {
         }
         
         /// <summary>
-        ///   Looks up a localized string similar to https://test.example/v3/search?take=20&amp;prerelease=True&amp;semVerLevel=2.0.0.
+        ///   Looks up a localized string similar to https://test.example/v3/search?pageCount=20&amp;prerelease=True&amp;semVerLevel=2.0.0.
         /// </summary>
         internal static string DefaultSearchUrl {
             get {

@@ -1,10 +1,12 @@
+using Microsoft.Extensions.Options;
 using System;
 using System.IO;
+using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
-using Microsoft.Extensions.Options;
+using Xanadu.Skidbladnir.IO.File;
 
-namespace BaGet.Core
+namespace BaGet.Core.Storage
 {
     /// <summary>
     /// Stores content on disk.
@@ -16,7 +18,7 @@ namespace BaGet.Core
 
         private readonly string _storePath;
 
-        public FileStorageService(IOptionsSnapshot<FileSystemStorageOptions> options)
+        public FileStorageService(IOptions<FileSystemStorageOptions> options)
         {
             if (options == null) throw new ArgumentNullException(nameof(options));
 
@@ -51,7 +53,6 @@ namespace BaGet.Core
             string contentType,
             CancellationToken cancellationToken = default)
         {
-            if (content == null) throw new ArgumentNullException(nameof(content));
             if (string.IsNullOrEmpty(contentType)) throw new ArgumentException("Content type is required", nameof(contentType));
 
             cancellationToken.ThrowIfCancellationRequested();
@@ -59,25 +60,22 @@ namespace BaGet.Core
             path = GetFullPath(path);
 
             // Ensure that the path exists.
-            Directory.CreateDirectory(Path.GetDirectoryName(path));
+            Directory.CreateDirectory(Path.GetDirectoryName(path)!);
 
             try
             {
-                using (var fileStream = File.Open(path, FileMode.CreateNew))
-                {
-                    await content.CopyToAsync(fileStream, DefaultCopyBufferSize, cancellationToken);
-                    return StoragePutResult.Success;
-                }
+                await using var fileStream = new BufferedStream(new FileStream(path, FileMode.CreateNew, FileAccess.Write));
+                await content.CopyToAsync(fileStream, DefaultCopyBufferSize, cancellationToken);
+                return StoragePutResult.Success;
             }
             catch (IOException) when (File.Exists(path))
             {
-                using (var targetStream = File.Open(path, FileMode.Open, FileAccess.Read, FileShare.Read))
-                {
-                    content.Position = 0;
-                    return content.Matches(targetStream)
-                        ? StoragePutResult.AlreadyExists
-                        : StoragePutResult.Conflict;
-                }
+                var checksum = new Checksum(SHAAlgorithm.SHA256);
+                var contentChecksum = (await checksum.GetStreamHashAsync(content, cancellationToken))!;
+                var pathChecksum = (await checksum.GetFileHashAsync(path, cancellationToken))!;
+                return contentChecksum.SequenceEqual(pathChecksum)
+                    ? StoragePutResult.AlreadyExists
+                    : StoragePutResult.Conflict;
             }
         }
 

@@ -14,7 +14,7 @@ namespace BaGet.Protocol.Models
         public AutocompleteContext Context { get; set; }
 
         /// <summary>
-        /// The total number of matches, disregarding skip and take.
+        /// The total number of matches, disregarding pageIndex and pageCount.
         /// </summary>
         [JsonPropertyName("totalHits")]
         public long TotalHits { get; set; }
@@ -23,6 +23,6 @@ namespace BaGet.Protocol.Models
         /// The package IDs matched by the autocomplete query.
         /// </summary>
         [JsonPropertyName("data")]
-        public IReadOnlyList<string> Data { get; set; }
+        public IEnumerable<string> Data { get; set; }
     }
 }

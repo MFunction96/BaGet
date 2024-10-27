@@ -11,7 +11,7 @@ namespace BaGet.Protocol.Models
     /// </summary>
     public class RegistrationLeafResponse
     {
-        public static readonly IReadOnlyList<string> DefaultType = new List<string>
+        public static readonly IEnumerable<string> DefaultType = new List<string>
         {
             "Package",
             "http://schema.nuget.org/catalog#Permalink"
@@ -27,7 +27,7 @@ namespace BaGet.Protocol.Models
         /// The registration leaf's type.
         /// </summary>
         [JsonPropertyName("@type")]
-        public IReadOnlyList<string> Type { get; set; }
+        public IEnumerable<string> Type { get; set; }
 
         /// <summary>
         /// Whether the package is listed.

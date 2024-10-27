@@ -16,7 +16,7 @@ namespace BaGet.Protocol
         /// See: https://docs.microsoft.com/en-us/nuget/api/search-autocomplete-service-resource#search-for-package-ids
         /// </summary>
         /// <param name="query">The autocomplete query.</param>
-        /// <param name="skip">How many results to skip.</param>
+        /// <param name="skip">How many results to pageIndex.</param>
         /// <param name="take">How many results to return.</param>
         /// <param name="includePrerelease">Whether pre-release packages should be returned.</param>
         /// <param name="includeSemVer2">Whether packages that require SemVer 2.0.0 compatibility should be returned.</param>

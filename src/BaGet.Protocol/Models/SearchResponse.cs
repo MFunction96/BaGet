@@ -11,10 +11,10 @@ namespace BaGet.Protocol.Models
     public class SearchResponse
     {
         [JsonPropertyName("@context")]
-        public SearchContext Context { get; set; }
+        public SearchContext? Context { get; set; }
 
         /// <summary>
-        /// The total number of matches, disregarding skip and take.
+        /// The total number of matches, disregarding pageIndex and pageCount.
         /// </summary>
         [JsonPropertyName("totalHits")]
         public long TotalHits { get; set; }
@@ -23,6 +23,6 @@ namespace BaGet.Protocol.Models
         /// The packages that matched the search query.
         /// </summary>
         [JsonPropertyName("data")]
-        public IReadOnlyList<SearchResult> Data { get; set; }
+        public IEnumerable<SearchResult>? Data { get; set; }
     }
 }

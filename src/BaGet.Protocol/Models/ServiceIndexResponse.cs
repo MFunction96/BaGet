@@ -20,6 +20,6 @@ namespace BaGet.Protocol.Models
         /// The resources declared by this service index.
         /// </summary>
         [JsonPropertyName("resources")]
-        public IReadOnlyList<ServiceIndexItem> Resources { get; set; }
+        public IEnumerable<ServiceIndexItem> Resources { get; set; }
     }
 }

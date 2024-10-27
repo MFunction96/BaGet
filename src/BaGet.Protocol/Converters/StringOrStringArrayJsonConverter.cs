@@ -8,9 +8,9 @@ namespace BaGet.Protocol.Internal
     /// <summary>
     /// This is an internal API that may be changed or removed without notice in any release.
     /// </summary>
-    public class StringOrStringArrayJsonConverter : JsonConverter<IReadOnlyList<string>>
+    public class StringOrStringArrayJsonConverter : JsonConverter<IEnumerable<string>>
     {
-        public override IReadOnlyList<string> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
+        public override IEnumerable<string> Read(ref Utf8JsonReader reader, Type typeToConvert, JsonSerializerOptions options)
         {
             // Try to read a single string first.
             if (reader.TokenType == JsonTokenType.String)
@@ -45,7 +45,7 @@ namespace BaGet.Protocol.Internal
             throw new JsonException();
         }
 
-        public override void Write(Utf8JsonWriter writer, IReadOnlyList<string> values, JsonSerializerOptions options)
+        public override void Write(Utf8JsonWriter writer, IEnumerable<string> values, JsonSerializerOptions options)
         {
             writer.WriteStartArray();
 

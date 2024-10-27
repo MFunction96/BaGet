@@ -1,8 +1,9 @@
-﻿using System.Threading;
-using System.Threading.Tasks;
-using BaGet.Core;
+using BaGet.Core.Search;
+using BaGet.Pages;
 using BaGet.Protocol.Models;
 using Moq;
+using System.Threading;
+using System.Threading.Tasks;
 using Xunit;
 
 namespace BaGet.Web.Tests
@@ -11,7 +12,7 @@ namespace BaGet.Web.Tests
     {
         private readonly IndexModel _target;
 
-        private SearchRequest _capturedRequest = null;
+        private SearchRequest _capturedRequest;
         private readonly SearchResponse _response = new SearchResponse();
         private readonly CancellationToken _cancellation = CancellationToken.None;
 
@@ -31,13 +32,7 @@ namespace BaGet.Web.Tests
         {
             await _target.OnGetAsync(_cancellation);
 
-            Assert.Equal(0, _capturedRequest.Skip);
-            Assert.Equal(20, _capturedRequest.Take);
-            Assert.True(_capturedRequest.IncludePrerelease);
-            Assert.True(_capturedRequest.IncludeSemVer2);
-            Assert.Null(_capturedRequest.PackageType);
-            Assert.Null(_capturedRequest.Framework);
-            Assert.Null(_capturedRequest.Query);
+            Assert.Null(_capturedRequest);
         }
 
         [Fact]
@@ -51,8 +46,8 @@ namespace BaGet.Web.Tests
 
             await _target.OnGetAsync(_cancellation);
 
-            Assert.Equal(80, _capturedRequest.Skip);
-            Assert.Equal(20, _capturedRequest.Take);
+            Assert.Equal(5, _capturedRequest.PageIndex);
+            Assert.Equal(20, _capturedRequest.PageCount);
             Assert.False(_capturedRequest.IncludePrerelease);
             Assert.True(_capturedRequest.IncludeSemVer2);
             Assert.Equal("foo", _capturedRequest.PackageType);

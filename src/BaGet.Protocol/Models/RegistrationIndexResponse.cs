@@ -10,7 +10,7 @@ namespace BaGet.Protocol.Models
     /// </summary>
     public class RegistrationIndexResponse
     {
-        public static readonly IReadOnlyList<string> DefaultType = new List<string>
+        public static readonly IEnumerable<string> DefaultType = new List<string>
         {
             "catalog:CatalogRoot",
             "PackageRegistration",
@@ -27,7 +27,7 @@ namespace BaGet.Protocol.Models
         /// The registration index's type.
         /// </summary>
         [JsonPropertyName("@type")]
-        public IReadOnlyList<string> Type { get; set; }
+        public IEnumerable<string> Type { get; set; }
 
         /// <summary>
         /// The number of registration pages. See <see cref="Pages"/>.
@@ -40,6 +40,6 @@ namespace BaGet.Protocol.Models
         /// by the package's version.
         /// </summary>
         [JsonPropertyName("items")]
-        public IReadOnlyList<RegistrationIndexPage> Pages { get; set; }
+        public IEnumerable<RegistrationIndexPage> Pages { get; set; }
     }
 }

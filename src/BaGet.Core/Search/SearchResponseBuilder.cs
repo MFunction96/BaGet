@@ -1,20 +1,13 @@
-﻿using System;
+using BaGet.Core.Metadata;
+using BaGet.Protocol.Models;
 using System.Collections.Generic;
 using System.Linq;
-using BaGet.Protocol.Models;
 
-namespace BaGet.Core
+namespace BaGet.Core.Search
 {
-    public class SearchResponseBuilder : ISearchResponseBuilder
+    public class SearchResponseBuilder(IUrlGenerator url) : ISearchResponseBuilder
     {
-        private readonly IUrlGenerator _url;
-
-        public SearchResponseBuilder(IUrlGenerator url)
-        {
-            _url = url ?? throw new ArgumentNullException(nameof(url));
-        }
-
-        public SearchResponse BuildSearch(IReadOnlyList<PackageRegistration> packageRegistrations)
+        public SearchResponse BuildSearch(IEnumerable<PackageRegistration> packageRegistrations)
         {
             var result = new List<SearchResult>();
 
@@ -23,27 +16,27 @@ namespace BaGet.Core
                 var versions = packageRegistration.Packages.OrderByDescending(p => p.Version).ToList();
                 var latest = versions.First();
                 var iconUrl = latest.HasEmbeddedIcon
-                    ? _url.GetPackageIconDownloadUrl(latest.Id, latest.Version)
-                    : latest.IconUrlString;
+                    ? url.GetPackageIconDownloadUrl(latest.Id, latest.Version)
+                    : latest.IconUrl?.AbsoluteUri;
 
                 result.Add(new SearchResult
                 {
                     PackageId = latest.Id,
                     Version = latest.Version.ToFullString(),
                     Description = latest.Description,
-                    Authors = latest.Authors,
-                    IconUrl = iconUrl,
-                    LicenseUrl = latest.LicenseUrlString,
-                    ProjectUrl = latest.ProjectUrlString,
-                    RegistrationIndexUrl = _url.GetRegistrationIndexUrl(latest.Id),
+                    Authors = latest.Authors.ToList(),
+                    IconUrl = iconUrl ?? string.Empty,
+                    LicenseUrl = latest.LicenseUrl?.AbsoluteUri ?? string.Empty,
+                    ProjectUrl = latest.ProjectUrl?.AbsoluteUri ?? string.Empty,
+                    RegistrationIndexUrl = url.GetRegistrationIndexUrl(latest.Id),
                     Summary = latest.Summary,
-                    Tags = latest.Tags,
+                    Tags = latest.Tags?.ToList() ?? [],
                     Title = latest.Title,
                     TotalDownloads = versions.Sum(p => p.Downloads),
                     Versions = versions
                         .Select(p => new SearchResultVersion
                         {
-                            RegistrationLeafUrl = _url.GetRegistrationLeafUrl(p.Id, p.Version),
+                            RegistrationLeafUrl = url.GetRegistrationLeafUrl(p.Id, p.Version),
                             Version = p.Version.ToFullString(),
                             Downloads = p.Downloads,
                         })
@@ -55,25 +48,25 @@ namespace BaGet.Core
             {
                 TotalHits = result.Count,
                 Data = result,
-                Context = SearchContext.Default(_url.GetPackageMetadataResourceUrl()),
+                Context = SearchContext.Default(url.GetPackageMetadataResourceUrl()),
             };
         }
 
-        public AutocompleteResponse BuildAutocomplete(IReadOnlyList<string> data)
+        public AutocompleteResponse BuildAutocomplete(IEnumerable<string> data)
         {
             return new AutocompleteResponse
             {
-                TotalHits = data.Count,
+                TotalHits = data.Count(),
                 Data = data,
                 Context = AutocompleteContext.Default
             };
         }
 
-        public DependentsResponse BuildDependents(IReadOnlyList<PackageDependent> packages)
+        public DependentsResponse BuildDependents(IEnumerable<PackageDependent> packages)
         {
             return new DependentsResponse
             {
-                TotalHits = packages.Count,
+                TotalHits = packages.Count(),
                 Data = packages,
             };
         }

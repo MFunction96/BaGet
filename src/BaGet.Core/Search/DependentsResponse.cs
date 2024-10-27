@@ -10,7 +10,7 @@ namespace BaGet.Core
     public class DependentsResponse
     {
         /// <summary>
-        /// The total number of matches, disregarding skip and take.
+        /// The total number of matches, disregarding pageIndex and pageCount.
         /// </summary>
         [JsonPropertyName("totalHits")]
         public long TotalHits { get; set; }
@@ -19,7 +19,7 @@ namespace BaGet.Core
         /// The package IDs matched by the dependent query.
         /// </summary>
         [JsonPropertyName("data")]
-        public IReadOnlyList<PackageDependent> Data { get; set; }
+        public IEnumerable<PackageDependent> Data { get; set; }
     }
 
     /// <summary>

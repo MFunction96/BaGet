@@ -1,30 +1,32 @@
+using NuGet.Frameworks;
 using System;
 using System.Collections.Concurrent;
 using System.Collections.Generic;
 using System.Linq;
-using NuGet.Frameworks;
 
-namespace BaGet.Core
+namespace BaGet.Core.Indexing
 {
-    using static NuGet.Frameworks.FrameworkConstants;
+    using static FrameworkConstants;
 
     public class FrameworkCompatibilityService : IFrameworkCompatibilityService
     {
         private const string AnyFramework = "any";
 
-        private static readonly Dictionary<string, NuGetFramework> KnownFrameworks;
-        private static readonly IReadOnlyList<OneWayCompatibilityMappingEntry> CompatibilityMapping;
-        private static readonly ConcurrentDictionary<NuGetFramework, IReadOnlyList<string>> CompatibleFrameworks;
+        private static readonly Dictionary<string, NuGetFramework?> KnownFrameworks;
+        private static readonly IEnumerable<OneWayCompatibilityMappingEntry> CompatibilityMapping;
+        private static readonly ConcurrentDictionary<NuGetFramework, IEnumerable<string>> CompatibleFrameworks;
 
         static FrameworkCompatibilityService()
         {
-            var supportedFrameworks = new HashSet<string>();
-            supportedFrameworks.Add(FrameworkIdentifiers.NetStandard);
-            supportedFrameworks.Add(FrameworkIdentifiers.NetCoreApp);
-            supportedFrameworks.Add(FrameworkIdentifiers.Net);
+            var supportedFrameworks = new HashSet<string>
+            {
+                FrameworkIdentifiers.NetStandard,
+                FrameworkIdentifiers.NetCoreApp,
+                FrameworkIdentifiers.Net
+            };
 
             CompatibilityMapping = DefaultFrameworkMappings.Instance.CompatibilityMappings.ToList();
-            CompatibleFrameworks = new ConcurrentDictionary<NuGetFramework, IReadOnlyList<string>>();
+            CompatibleFrameworks = new ConcurrentDictionary<NuGetFramework, IEnumerable<string>>();
 
             KnownFrameworks = typeof(CommonFrameworks)
                 .GetFields()
@@ -39,7 +41,7 @@ namespace BaGet.Core
             KnownFrameworks["net471"] = new NuGetFramework(FrameworkIdentifiers.Net, new Version(4, 7, 1, 0));
         }
 
-        public IReadOnlyList<string> FindAllCompatibleFrameworks(string name)
+        public IEnumerable<string> FindAllCompatibleFrameworks(string name)
         {
             if (!KnownFrameworks.TryGetValue(name, out var framework))
             {
@@ -49,7 +51,7 @@ namespace BaGet.Core
             return CompatibleFrameworks.GetOrAdd(framework, FindAllCompatibleFrameworks);
         }
 
-        private IReadOnlyList<string> FindAllCompatibleFrameworks(NuGetFramework targetFramework)
+        private IEnumerable<string> FindAllCompatibleFrameworks(NuGetFramework targetFramework)
         {
             var results = new HashSet<string> { AnyFramework };
 

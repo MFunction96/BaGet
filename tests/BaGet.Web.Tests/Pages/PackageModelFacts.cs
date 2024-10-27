@@ -1,10 +1,14 @@
-﻿using System;
+using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
 using BaGet.Core;
+using BaGet.Core.Content;
+using BaGet.Core.Entities;
+using BaGet.Core.Search;
+using BaGet.Pages;
 using Moq;
 using NuGet.Versioning;
 using Xunit;
@@ -89,13 +93,13 @@ namespace BaGet.Web.Tests
             Assert.Equal("testpackage", _target.Package.Id);
             Assert.Equal("2.0.0", _target.Package.NormalizedVersionString);
 
-            Assert.Equal(3, _target.Versions.Count);
-            Assert.Equal("3.0.0", _target.Versions[0].Version.OriginalVersion);
-            Assert.False(_target.Versions[0].Selected);
-            Assert.Equal("2.0.0", _target.Versions[1].Version.OriginalVersion);
-            Assert.True(_target.Versions[1].Selected);
-            Assert.Equal("1.0.0", _target.Versions[2].Version.OriginalVersion);
-            Assert.False(_target.Versions[2].Selected);
+            Assert.Equal(3, _target.Versions.Count());
+            Assert.Equal("3.0.0", _target.Versions.ToArray()[0].Version.OriginalVersion);
+            Assert.False(_target.Versions.ToArray()[0].Selected);
+            Assert.Equal("2.0.0", _target.Versions.ToArray()[1].Version.OriginalVersion);
+            Assert.True(_target.Versions.ToArray()[1].Selected);
+            Assert.Equal("1.0.0", _target.Versions.ToArray()[2].Version.OriginalVersion);
+            Assert.False(_target.Versions.ToArray()[2].Selected);
         }
 
         [Fact]
@@ -116,11 +120,11 @@ namespace BaGet.Web.Tests
             Assert.Equal("testpackage", _target.Package.Id);
             Assert.Equal("2.0.0", _target.Package.NormalizedVersionString);
 
-            Assert.Equal(2, _target.Versions.Count);
-            Assert.Equal("3.0.0", _target.Versions[0].Version.OriginalVersion);
-            Assert.False(_target.Versions[0].Selected);
-            Assert.Equal("1.0.0", _target.Versions[1].Version.OriginalVersion);
-            Assert.False(_target.Versions[1].Selected);
+            Assert.Equal(2, _target.Versions.Count());
+            Assert.Equal("3.0.0", _target.Versions.ToArray()[0].Version.OriginalVersion);
+            Assert.False(_target.Versions.ToArray()[0].Selected);
+            Assert.Equal("1.0.0", _target.Versions.ToArray()[1].Version.OriginalVersion);
+            Assert.False(_target.Versions.ToArray()[1].Selected);
         }
 
         [Fact]
@@ -141,11 +145,11 @@ namespace BaGet.Web.Tests
             Assert.Equal("testpackage", _target.Package.Id);
             Assert.Equal("2.0.0", _target.Package.NormalizedVersionString);
 
-            Assert.Equal(2, _target.Versions.Count);
-            Assert.Equal("2.0.0", _target.Versions[0].Version.OriginalVersion);
-            Assert.True(_target.Versions[0].Selected);
-            Assert.Equal("1.0.0", _target.Versions[1].Version.OriginalVersion);
-            Assert.False(_target.Versions[1].Selected);
+            Assert.Equal(2, _target.Versions.Count());
+            Assert.Equal("2.0.0", _target.Versions.ToArray()[0].Version.OriginalVersion);
+            Assert.True(_target.Versions.ToArray()[0].Selected);
+            Assert.Equal("1.0.0", _target.Versions.ToArray()[1].Version.OriginalVersion);
+            Assert.False(_target.Versions.ToArray()[1].Selected);
         }
 
         [Theory]
@@ -193,9 +197,9 @@ namespace BaGet.Web.Tests
 
             await _target.OnGetAsync("testpackage", "1.0.0", _cancellation);
 
-            Assert.Equal(2, _target.UsedBy.Count);
-            Assert.Equal("Used by 1", _target.UsedBy[0].Id);
-            Assert.Equal("Used by 2", _target.UsedBy[1].Id);
+            Assert.Equal(2, _target.UsedBy.Count());
+            Assert.Equal("Used by 1", _target.UsedBy.ToArray()[0].Id);
+            Assert.Equal("Used by 2", _target.UsedBy.ToArray()[1].Id);
         }
 
         [Fact]
@@ -231,25 +235,28 @@ namespace BaGet.Web.Tests
             await _target.OnGetAsync("testpackage", "1.0.0", _cancellation);
 
             Assert.True(_target.Found);
-            Assert.Equal(2, _target.DependencyGroups.Count);
-            Assert.Equal(".NET 5.0", _target.DependencyGroups[0].Name);
-            Assert.Equal(".NET Framework 4.8", _target.DependencyGroups[1].Name);
+            Assert.Equal(2, _target.DependencyGroups.Count());
+            Assert.Equal(".NET 5.0", _target.DependencyGroups.ToArray()[0].Name);
+            Assert.Equal(".NET Framework 4.8", _target.DependencyGroups.ToArray()[1].Name);
 
-            Assert.Equal(2, _target.DependencyGroups[0].Dependencies.Count);
-            Assert.Equal(1, _target.DependencyGroups[1].Dependencies.Count);
+            Assert.Equal(2, _target.DependencyGroups.ToArray()[0].Dependencies.Count());
+            Assert.Single(_target.DependencyGroups.ToArray()[1].Dependencies);
 
-            Assert.Equal("Dependency1", _target.DependencyGroups[0].Dependencies[0].PackageId);
-            Assert.Equal("(>= 1.0.0)", _target.DependencyGroups[0].Dependencies[0].VersionSpec);
+            Assert.Equal("Dependency1", _target.DependencyGroups.ToArray()[0].Dependencies.ToArray()[0].PackageId);
+            Assert.Equal("(>= 1.0.0)", _target.DependencyGroups.ToArray()[0].Dependencies.ToArray()[0].VersionSpec);
 
-            Assert.Equal("Dependency3", _target.DependencyGroups[0].Dependencies[1].PackageId);
-            Assert.Equal("(>= 3.0.0)", _target.DependencyGroups[0].Dependencies[1].VersionSpec);
+            Assert.Equal("Dependency3", _target.DependencyGroups.ToArray()[0].Dependencies.ToArray()[1].PackageId);
+            Assert.Equal("(>= 3.0.0)", _target.DependencyGroups.ToArray()[0].Dependencies.ToArray()[1].VersionSpec);
 
-            Assert.Equal("Dependency2", _target.DependencyGroups[1].Dependencies[0].PackageId);
-            Assert.Equal("(>= 2.0.0)", _target.DependencyGroups[1].Dependencies[0].VersionSpec);
+            Assert.Equal("Dependency2", _target.DependencyGroups.ToArray()[1].Dependencies.ToArray()[0].PackageId);
+            Assert.Equal("(>= 2.0.0)", _target.DependencyGroups.ToArray()[1].Dependencies.ToArray()[0].VersionSpec);
         }
 
         [Theory]
         [InlineData(null, "All Frameworks")]
+        [InlineData("net8.0", ".NET 8.0")]
+        [InlineData("net7.0", ".NET 7.0")]
+        [InlineData("net6.0", ".NET 6.0")]
         [InlineData("net5.0", ".NET 5.0")]
         [InlineData("netstandard2.1", ".NET Standard 2.1")]
         [InlineData("netcoreapp3.1", ".NET Core 3.1")]

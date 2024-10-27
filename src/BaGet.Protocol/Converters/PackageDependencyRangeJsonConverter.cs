@@ -17,7 +17,7 @@ namespace BaGet.Protocol.Internal
             }
 
             // There are some quirky packages with arrays of dependency version ranges.
-            // In this case, we take the first element.
+            // In this case, we pageCount the first element.
             // Example: https://api.nuget.org/v3/catalog0/data/2016.02.21.11.06.01/dingu.generic.repo.ef7.1.0.0-beta2.json
             if (reader.TokenType != JsonTokenType.StartArray)
             {

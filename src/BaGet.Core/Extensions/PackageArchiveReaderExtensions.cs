@@ -4,6 +4,7 @@ using System.IO;
 using System.Linq;
 using System.Threading;
 using System.Threading.Tasks;
+using BaGet.Core.Entities;
 using NuGet.Common;
 using NuGet.Packaging;
 
@@ -19,7 +20,7 @@ namespace BaGet.Core
         public static bool HasEmbeddedIcon(this PackageArchiveReader package)
             => !string.IsNullOrEmpty(package.NuspecReader.GetIcon());
 
-        public async static Task<Stream> GetReadmeAsync(
+        public static async Task<Stream> GetReadmeAsync(
             this PackageArchiveReader package,
             CancellationToken cancellationToken)
         {
@@ -32,7 +33,7 @@ namespace BaGet.Core
             return await package.GetStreamAsync(readmePath, cancellationToken);
         }
 
-        public async static Task<Stream> GetIconAsync(
+        public static async Task<Stream> GetIconAsync(
             this PackageArchiveReader package,
             CancellationToken cancellationToken)
         {
@@ -45,13 +46,13 @@ namespace BaGet.Core
         {
             var nuspec = packageReader.NuspecReader;
 
-            (var repositoryUri, var repositoryType) = GetRepositoryMetadata(nuspec);
+            var (repositoryUri, repositoryType) = GetRepositoryMetadata(nuspec);
 
             return new Package
             {
                 Id = nuspec.GetId(),
                 Version = nuspec.GetVersion(),
-                Authors = ParseAuthors(nuspec.GetAuthors()),
+                Authors = ParseAuthors(nuspec.GetAuthors()).ToList(),
                 Description = nuspec.GetDescription(),
                 HasReadme = packageReader.HasReadme(),
                 HasEmbeddedIcon = packageReader.HasEmbeddedIcon(),
@@ -71,7 +72,7 @@ namespace BaGet.Core
                 RepositoryUrl = repositoryUri,
                 RepositoryType = repositoryType,
                 Dependencies = GetDependencies(nuspec),
-                Tags = ParseTags(nuspec.GetTags()),
+                Tags = ParseTags(nuspec.GetTags()).ToList(),
                 PackageTypes = GetPackageTypes(nuspec),
                 TargetFrameworks = GetTargetFrameworks(packageReader),
             };
@@ -100,18 +101,14 @@ namespace BaGet.Core
             return SemVerLevel.Unknown;
         }
 
-        private static Uri ParseUri(string uriString)
+        private static Uri? ParseUri(string uriString)
         {
-            if (string.IsNullOrEmpty(uriString)) return null;
-
-            return new Uri(uriString);
+            return string.IsNullOrEmpty(uriString) ? null : new Uri(uriString);
         }
 
         private static string[] ParseAuthors(string authors)
         {
-            if (string.IsNullOrEmpty(authors)) return new string[0];
-
-            return authors.Split(new[] { ',', ';', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
+            return string.IsNullOrEmpty(authors) ? [] : authors.Split([',', ';', '\t', '\n', '\r'], StringSplitOptions.RemoveEmptyEntries);
         }
 
         private static string[] ParseTags(string tags)
@@ -121,7 +118,7 @@ namespace BaGet.Core
             return tags.Split(new[] { ',', ';', ' ', '\t', '\n', '\r' }, StringSplitOptions.RemoveEmptyEntries);
         }
 
-        private static (Uri repositoryUrl, string repositoryType) GetRepositoryMetadata(NuspecReader nuspec)
+        private static (Uri? repositoryUrl, string? repositoryType) GetRepositoryMetadata(NuspecReader nuspec)
         {
             var repository = nuspec.GetRepositoryMetadata();
 

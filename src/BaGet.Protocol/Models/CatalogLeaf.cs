@@ -24,7 +24,7 @@ namespace BaGet.Protocol.Models
         /// The type of the current catalog leaf.
         /// </summary>
         [JsonPropertyName("@type")]
-        public IReadOnlyList<string> Type { get; set; }
+        public IEnumerable<string> Type { get; set; }
 
         /// <summary>
         /// The catalog commit ID associated with this catalog item.

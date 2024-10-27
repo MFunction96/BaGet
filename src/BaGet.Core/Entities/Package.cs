@@ -1,27 +1,42 @@
+using Microsoft.EntityFrameworkCore;
+using NuGet.Versioning;
 using System;
 using System.Collections.Generic;
-using NuGet.Versioning;
+using System.ComponentModel.DataAnnotations;
+using System.ComponentModel.DataAnnotations.Schema;
+using System.Text.Json.Serialization;
 
-namespace BaGet.Core
+// ReSharper disable EntityFramework.ModelValidation.UnlimitedStringLength
+
+namespace BaGet.Core.Entities
 {
-    // See NuGetGallery's: https://github.com/NuGet/NuGetGallery/blob/master/src/NuGetGallery.Core/Entities/Package.cs
-    public class Package
+    // See NuGetGallery's: https://github.com/NuGet/NuGetGallery/blob/main/src/NuGet.Services.Entities/Package.cs
+    [Index(nameof(Id))]
+    public class Package : IEntity
     {
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public ICollection<PackageDependency> Dependencies { get; set; } = new HashSet<PackageDependency>();
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public ICollection<PackageType> PackageTypes { get; set; } = new HashSet<PackageType>();
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public ICollection<TargetFramework> TargetFrameworks { get; set; } = new HashSet<TargetFramework>();
+
+        [Key]
         public int Key { get; set; }
 
-        public string Id { get; set; }
+        [Required]
+        [Unicode]
+        [MaxLength(BaGetDbContext.MaxPackageIdLength)]
+        public string Id { get; set; } = string.Empty;
 
+        [NotMapped]
         public NuGetVersion Version
         {
-            get
-            {
+            get =>
                 // Favor the original version string as it contains more information.
                 // Packages uploaded with older versions of BaGet may not have the original version string.
-                return NuGetVersion.Parse(
-                    OriginalVersionString != null
-                        ? OriginalVersionString
-                        : NormalizedVersionString);
-            }
+                NuGetVersion.Parse(
+                    OriginalVersionString ?? NormalizedVersionString);
 
             set
             {
@@ -30,47 +45,61 @@ namespace BaGet.Core
             }
         }
 
-        public string[] Authors { get; set; }
-        public string Description { get; set; }
+        [Unicode]
+        [Column(TypeName = "text")]
+        public string Description { get; set; } = string.Empty;
         public long Downloads { get; set; }
         public bool HasReadme { get; set; }
         public bool HasEmbeddedIcon { get; set; }
         public bool IsPrerelease { get; set; }
-        public string ReleaseNotes { get; set; }
-        public string Language { get; set; }
+        [Unicode]
+        public List<string> Authors { get; set; } = [];
+        [Unicode]
+        [Column(TypeName = "text")]
+        public string? ReleaseNotes { get; set; }
+        [Unicode]
+        [MaxLength(BaGetDbContext.MaxPackageLanguageLength)]
+        public string Language { get; set; } = string.Empty;
         public bool Listed { get; set; }
-        public string MinClientVersion { get; set; }
+        [Unicode]
+        [MaxLength(BaGetDbContext.MaxPackageMinClientVersionLength)]
+        public string MinClientVersion { get; set; } = string.Empty;
         public DateTime Published { get; set; }
         public bool RequireLicenseAcceptance { get; set; }
         public SemVerLevel SemVerLevel { get; set; }
-        public string Summary { get; set; }
-        public string Title { get; set; }
+        [Unicode]
+        [Column(TypeName = "text")]
+        public string Summary { get; set; } = string.Empty;
+        [Unicode]
+        [MaxLength(BaGetDbContext.MaxPackageTitleLength)]
+        public string Title { get; set; } = string.Empty;
+        public Uri? IconUrl { get; set; }
+        public Uri? LicenseUrl { get; set; }
+        public Uri? ProjectUrl { get; set; }
+        public Uri? RepositoryUrl { get; set; }
+        [Unicode]
+        [MaxLength(BaGetDbContext.MaxRepositoryTypeLength)]
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? RepositoryType { get; set; }
 
-        public Uri IconUrl { get; set; }
-        public Uri LicenseUrl { get; set; }
-        public Uri ProjectUrl { get; set; }
-
-        public Uri RepositoryUrl { get; set; }
-        public string RepositoryType { get; set; }
-
-        public string[] Tags { get; set; }
+        [Unicode]
+        public List<string>? Tags { get; set; }
 
         /// <summary>
-        /// Used for optimistic concurrency.
+        /// Used for optimistic concurrency. TODO: Create an interceptors onto SaveChanges to handle this.
         /// </summary>
-        public byte[] RowVersion { get; set; }
+        [ConcurrencyCheck]
+        public Guid RowVersion { get; set; } = Guid.NewGuid();
 
-        public List<PackageDependency> Dependencies { get; set; }
-        public List<PackageType> PackageTypes { get; set; }
-        public List<TargetFramework> TargetFrameworks { get; set; }
+        [Column("Version")]
+        [Unicode]
+        [Required]
+        [MaxLength(BaGetDbContext.MaxPackageVersionLength)]
+        public string NormalizedVersionString { get; set; } = string.Empty;
 
-        public string NormalizedVersionString { get; set; }
-        public string OriginalVersionString { get; set; }
-
-
-        public string IconUrlString => IconUrl?.AbsoluteUri ?? string.Empty;
-        public string LicenseUrlString => LicenseUrl?.AbsoluteUri ?? string.Empty;
-        public string ProjectUrlString => ProjectUrl?.AbsoluteUri ?? string.Empty;
-        public string RepositoryUrlString => RepositoryUrl?.AbsoluteUri ?? string.Empty;
+        [Column("OriginalVersion")]
+        [Unicode]
+        [MaxLength(BaGetDbContext.MaxPackageVersionLength)]
+        public string? OriginalVersionString { get; set; }
     }
 }

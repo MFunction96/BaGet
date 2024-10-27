@@ -21,7 +21,7 @@ namespace BaGet.Protocol.Models
         /// Deprecation reasons include: "Legacy", "CriticalBugs", and "Other".
         /// </summary>
         [JsonPropertyName("reasons")]
-        public IReadOnlyList<string> Reasons { get; set; }
+        public IEnumerable<string> Reasons { get; set; }
 
         /// <summary>
         /// The additional details about this deprecation.

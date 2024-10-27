@@ -1,13 +1,23 @@
-namespace BaGet.Core
+using Microsoft.EntityFrameworkCore;
+using System.ComponentModel.DataAnnotations;
+
+namespace BaGet.Core.Entities
 {
-    // See NuGetGallery.Core's: https://github.com/NuGet/NuGetGallery/blob/master/src/NuGetGallery.Core/Entities/PackageType.cs
-    public class PackageType
+    // See NuGet.Services.Entities' : https://github.com/NuGet/NuGetGallery/blob/main/src/NuGet.Services.Entities/PackageType.cs
+    [Index(nameof(Name))]
+    public class PackageType : IEntity
     {
+        [Key]
         public int Key { get; set; }
+        [Unicode]
+        [MaxLength(BaGetDbContext.MaxPackageTypeNameLength)]
+        public string? Name { get; set; }
+        [Unicode]
+        [MaxLength(BaGetDbContext.MaxPackageTypeVersionLength)]
+        public string? Version { get; set; }
 
-        public string Name { get; set; }
-        public string Version { get; set; }
+        public int PackageKey { get; set; }
 
-        public Package Package { get; set; }
+        public Package Package { get; set; } = null!;
     }
 }

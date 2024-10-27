@@ -1,5 +1,7 @@
 using System.Collections.Generic;
 using System.Linq;
+using BaGet.Core.Entities;
+using BaGet.Core.Metadata;
 using Moq;
 using NuGet.Versioning;
 using Xunit;
@@ -40,11 +42,11 @@ namespace BaGet.Core.Tests.Metadata
             var response = registrationBuilder.BuildIndex(registration);
 
             // Assert
-            Assert.Equal(packages.Count, response.Pages[0].ItemsOrNull.Count);
+            Assert.Equal(packages.Count, response.Pages.First().ItemsOrNull.Count());
             var index = 0;
             foreach (var package in packages.OrderBy(p => p.Version))
             {
-                Assert.Equal(package.Version.ToFullString(), response.Pages[0].ItemsOrNull[index++].PackageMetadata.Version);
+                Assert.Equal(package.Version.ToFullString(), response.Pages.First().ItemsOrNull.ToArray()[index++].PackageMetadata.Version);
             }
         }
 
@@ -56,8 +58,8 @@ namespace BaGet.Core.Tests.Metadata
             return new Package
             {
                 Id = packageId,
-                Authors = new string[] { "test" },
-                PackageTypes = new List<PackageType> { new PackageType { Name = "test" } },
+                Authors = ["test"],
+                PackageTypes = new List<PackageType> { new() { Name = "test" } },
                 Dependencies = new List<PackageDependency> { },
                 Version = new NuGetVersion(version),
             };

@@ -1,6 +1,6 @@
 using System.Collections.Generic;
 
-namespace BaGet.Core
+namespace BaGet.Core.Indexing
 {
     /// <summary>
     /// Used to determine the compatibility matrix between frameworks.
@@ -12,6 +12,6 @@ namespace BaGet.Core
         /// </summary>
         /// <param name="framework">The input framework.</param>
         /// <returns>The list of compatible frameworks.</returns>
-        IReadOnlyList<string> FindAllCompatibleFrameworks(string framework);
+        IEnumerable<string> FindAllCompatibleFrameworks(string framework);
     }
 }

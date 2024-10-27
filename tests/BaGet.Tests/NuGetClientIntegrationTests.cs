@@ -1,15 +1,15 @@
+using BaGet.Tests.Support;
+using NuGet.Configuration;
+using NuGet.Protocol;
+using NuGet.Protocol.Core.Types;
+using NuGet.Versioning;
 using System;
 using System.Collections.Generic;
 using System.IO;
 using System.Net.Http;
 using System.Threading;
 using System.Threading.Tasks;
-using NuGet.Configuration;
-using NuGet.Protocol;
-using NuGet.Protocol.Core.Types;
-using NuGet.Versioning;
 using Xunit;
-using Xunit.Abstractions;
 
 namespace BaGet.Tests
 {
@@ -28,9 +28,9 @@ namespace BaGet.Tests
         private readonly NuGet.Common.ILogger _logger;
         private readonly CancellationToken _cancellationToken;
 
-        public NuGetClientIntegrationTests(ITestOutputHelper output)
+        public NuGetClientIntegrationTests()
         {
-            _app = new BaGetApplication(output);
+            _app = new BaGetApplication();
             _client = _app.CreateDefaultClient();
             _packageStream = TestResources.GetResourceStream(TestResources.Package);
 
@@ -143,9 +143,9 @@ namespace BaGet.Tests
         [Fact]
         public async Task VersionListReturnsResults()
         {
-            await _app.AddPackageAsync(_packageStream);
+            await _app.AddPackageAsync(_packageStream, cancellationToken: _cancellationToken);
 
-            var resource = await _repository.GetResourceAsync<FindPackageByIdResource>();
+            var resource = await _repository.GetResourceAsync<FindPackageByIdResource>(_cancellationToken);
             var versions = await resource.GetAllVersionsAsync(
                 "TestData",
                 _cache,
@@ -219,9 +219,9 @@ namespace BaGet.Tests
         [Fact]
         public async Task PackageMetadataReturnsOk()
         {
-            await _app.AddPackageAsync(_packageStream);
+            await _app.AddPackageAsync(_packageStream, cancellationToken: _cancellationToken);
 
-            var resource = await _repository.GetResourceAsync<PackageMetadataResource>();
+            var resource = await _repository.GetResourceAsync<PackageMetadataResource>(_cancellationToken);
             var packages = await resource.GetMetadataAsync(
                 "TestData",
                 includePrerelease: true,
