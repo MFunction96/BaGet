@@ -13,7 +13,7 @@ namespace BaGet.Core.Indexing
         private const string AnyFramework = "any";
 
         private static readonly Dictionary<string, NuGetFramework?> KnownFrameworks;
-        private static readonly IReadOnlyList<OneWayCompatibilityMappingEntry> CompatibilityMapping;
+        private static readonly IEnumerable<OneWayCompatibilityMappingEntry> CompatibilityMapping;
         private static readonly ConcurrentDictionary<NuGetFramework, IEnumerable<string>> CompatibleFrameworks;
 
         static FrameworkCompatibilityService()

@@ -52,21 +52,21 @@ namespace BaGet.Core.Search
             };
         }
 
-        public AutocompleteResponse BuildAutocomplete(IReadOnlyList<string> data)
+        public AutocompleteResponse BuildAutocomplete(IEnumerable<string> data)
         {
             return new AutocompleteResponse
             {
-                TotalHits = data.Count,
+                TotalHits = data.Count(),
                 Data = data,
                 Context = AutocompleteContext.Default
             };
         }
 
-        public DependentsResponse BuildDependents(IReadOnlyList<PackageDependent> packages)
+        public DependentsResponse BuildDependents(IEnumerable<PackageDependent> packages)
         {
             return new DependentsResponse
             {
-                TotalHits = packages.Count,
+                TotalHits = packages.Count(),
                 Data = packages,
             };
         }

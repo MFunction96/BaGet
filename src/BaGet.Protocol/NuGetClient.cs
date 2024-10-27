@@ -158,7 +158,7 @@ namespace BaGet.Protocol
         /// <param name="packageId">The package ID.</param>
         /// <param name="cancellationToken">A token to cancel the task.</param>
         /// <returns>The package's listed versions, if any.</returns>
-        public virtual async Task<IReadOnlyList<NuGetVersion>> ListPackageVersionsAsync(
+        public virtual async Task<IEnumerable<NuGetVersion>> ListPackageVersionsAsync(
             string packageId,
             CancellationToken cancellationToken = default)
         {

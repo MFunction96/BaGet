@@ -15,7 +15,8 @@ namespace BaGet.Protocol.Models
         /// The URL to the document used to produce this object.
         /// </summary>
         [JsonPropertyName("@id")]
-        public string CatalogLeafUrl { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? CatalogLeafUrl { get; set; }
 
         /// <summary>
         /// The ID of the package.
@@ -39,13 +40,14 @@ namespace BaGet.Protocol.Models
         /// The dependencies of the package, grouped by target framework.
         /// </summary>
         [JsonPropertyName("dependencyGroups")]
-        public IReadOnlyList<DependencyGroupItem> DependencyGroups { get; set; }
+        public IEnumerable<DependencyGroupItem> DependencyGroups { get; set; }
 
         /// <summary>
         /// The deprecation associated with the package, if any.
         /// </summary>
         [JsonPropertyName("deprecation")]
-        public PackageDeprecation Deprecation { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public PackageDeprecation? Deprecation { get; set; }
 
         /// <summary>
         /// The package's description.
@@ -118,7 +120,7 @@ namespace BaGet.Protocol.Models
         /// The package's tags.
         /// </summary>
         [JsonPropertyName("tags")]
-        public IReadOnlyList<string> Tags { get; set; }
+        public IEnumerable<string> Tags { get; set; }
 
         /// <summary>
         /// The package's title.

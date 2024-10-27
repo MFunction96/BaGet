@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading.Tasks;
 using BaGet.Protocol.Internal;
 using Xunit;
@@ -19,7 +20,7 @@ namespace BaGet.Protocol.Tests
             var result = await _target.GetAsync();
 
             Assert.Equal("3.0.0", result.Version);
-            Assert.Equal(5, result.Resources.Count);
+            Assert.Equal(5, result.Resources.Count());
 
             Assert.Equal(TestData.CatalogIndexUrl, result.GetCatalogResourceUrl());
             Assert.Equal(TestData.PackageMetadataUrl, result.GetPackageMetadataResourceUrl());

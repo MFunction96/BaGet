@@ -10,7 +10,7 @@ namespace BaGet.Core
 {
     public class PackageService(IPackageDatabase db) : IPackageService
     {
-        public async Task<IReadOnlyList<NuGetVersion>> FindPackageVersionsAsync(
+        public async Task<IEnumerable<NuGetVersion>> FindPackageVersionsAsync(
             string id,
             CancellationToken cancellationToken)
         {
@@ -26,7 +26,7 @@ namespace BaGet.Core
             return upstreamVersions.Concat(localVersions).Distinct().ToList();
         }
 
-        public async Task<IReadOnlyList<Package>> FindPackagesAsync(string id, CancellationToken cancellationToken)
+        public async Task<IEnumerable<Package>> FindPackagesAsync(string id, CancellationToken cancellationToken)
         {
             var upstreamPackages = Array.Empty<Package>();//await _upstream.ListPackagesAsync(id, cancellationToken);
             var localPackages = await db.FindAsync(id, includeUnlisted: true, cancellationToken);

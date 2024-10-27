@@ -7,7 +7,7 @@ namespace BaGet.Core.Search
     public interface ISearchResponseBuilder
     {
         SearchResponse BuildSearch(IEnumerable<PackageRegistration> results);
-        AutocompleteResponse BuildAutocomplete(IReadOnlyList<string> data);
-        DependentsResponse BuildDependents(IReadOnlyList<PackageDependent> results);
+        AutocompleteResponse BuildAutocomplete(IEnumerable<string> data);
+        DependentsResponse BuildDependents(IEnumerable<PackageDependent> results);
     }
 }

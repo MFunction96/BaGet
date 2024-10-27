@@ -36,8 +36,8 @@ namespace BaGet.Core.Tests.Metadata
                         {
                             "Pages",
                             (
-                                From: typeof(IReadOnlyList<RegistrationIndexPage>),
-                                To: typeof(IReadOnlyList<BaGetRegistrationIndexPage>)
+                                From: typeof(IEnumerable<RegistrationIndexPage>),
+                                To: typeof(IEnumerable<BaGetRegistrationIndexPage>)
                             )
                         },
                     }
@@ -56,8 +56,8 @@ namespace BaGet.Core.Tests.Metadata
                         {
                             "ItemsOrNull",
                             (
-                                From: typeof(IReadOnlyList<RegistrationIndexPageItem>),
-                                To: typeof(IReadOnlyList<BaGetRegistrationIndexPageItem>)
+                                From: typeof(IEnumerable<RegistrationIndexPageItem>),
+                                To: typeof(IEnumerable<BaGetRegistrationIndexPageItem>)
                             )
                         },
                     }
@@ -91,7 +91,7 @@ namespace BaGet.Core.Tests.Metadata
                     {
                         { "Downloads", typeof(long) },
                         { "HasReadme", typeof(bool) },
-                        { "PackageTypes", typeof(IReadOnlyList<string>) },
+                        { "PackageTypes", typeof(IEnumerable<string>) },
                         { "ReleaseNotes", typeof(string) },
                         { "RepositoryUrl", typeof(string) },
                         { "RepositoryType", typeof(string) },

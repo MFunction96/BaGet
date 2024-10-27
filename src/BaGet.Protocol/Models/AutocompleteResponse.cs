@@ -23,6 +23,6 @@ namespace BaGet.Protocol.Models
         /// The package IDs matched by the autocomplete query.
         /// </summary>
         [JsonPropertyName("data")]
-        public IReadOnlyList<string> Data { get; set; }
+        public IEnumerable<string> Data { get; set; }
     }
 }

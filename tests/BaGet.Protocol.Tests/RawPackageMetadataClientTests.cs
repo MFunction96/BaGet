@@ -1,3 +1,4 @@
+using System.Linq;
 using System.Threading.Tasks;
 using BaGet.Protocol.Internal;
 using NuGet.Versioning;
@@ -20,19 +21,19 @@ namespace BaGet.Protocol.Tests
             var result = await _target.GetRegistrationIndexOrNullAsync("Test.Package");
 
             Assert.NotNull(result);
-            Assert.Equal(2, result.Pages.Count);
+            Assert.Equal(2, result.Pages.Count());
 
-            Assert.True(result.Pages[0].Count == 1);
-            Assert.True(result.Pages[0].ItemsOrNull.Count == 1);
-            Assert.Equal("1.0.0", result.Pages[0].Lower);
-            Assert.Equal("1.0.0", result.Pages[0].Upper);
-            Assert.StartsWith(TestData.RegistrationIndexInlinedItemsUrl, result.Pages[0].RegistrationPageUrl);
+            Assert.True(result.Pages.ToArray()[0].Count == 1);
+            Assert.True(result.Pages.ToArray()[0].ItemsOrNull.Count() == 1);
+            Assert.Equal("1.0.0", result.Pages.ToArray()[0].Lower);
+            Assert.Equal("1.0.0", result.Pages.ToArray()[0].Upper);
+            Assert.StartsWith(TestData.RegistrationIndexInlinedItemsUrl, result.Pages.ToArray()[0].RegistrationPageUrl);
 
-            Assert.True(result.Pages[1].Count == 2);
-            Assert.True(result.Pages[1].ItemsOrNull.Count == 2);
-            Assert.Equal("2.0.0", result.Pages[1].Lower);
-            Assert.Equal("3.0.0", result.Pages[1].Upper);
-            Assert.StartsWith(TestData.RegistrationIndexInlinedItemsUrl, result.Pages[1].RegistrationPageUrl);
+            Assert.True(result.Pages.ToArray()[1].Count == 2);
+            Assert.True(result.Pages.ToArray()[1].ItemsOrNull.Count() == 2);
+            Assert.Equal("2.0.0", result.Pages.ToArray()[1].Lower);
+            Assert.Equal("3.0.0", result.Pages.ToArray()[1].Upper);
+            Assert.StartsWith(TestData.RegistrationIndexInlinedItemsUrl, result.Pages.ToArray()[1].RegistrationPageUrl);
         }
 
         [Fact]
@@ -41,17 +42,17 @@ namespace BaGet.Protocol.Tests
             var result = await _target.GetRegistrationIndexOrNullAsync("Paged.Package");
 
             Assert.NotNull(result);
-            Assert.Equal(2, result.Pages.Count);
+            Assert.Equal(2, result.Pages.Count());
 
-            Assert.True(result.Pages[0].Count == 1);
-            Assert.Null(result.Pages[0].ItemsOrNull);
-            Assert.Equal("1.0.0", result.Pages[0].Lower);
-            Assert.Equal("1.0.0", result.Pages[0].Upper);
+            Assert.True(result.Pages.ToArray()[0].Count == 1);
+            Assert.Null(result.Pages.ToArray()[0].ItemsOrNull);
+            Assert.Equal("1.0.0", result.Pages.ToArray()[0].Lower);
+            Assert.Equal("1.0.0", result.Pages.ToArray()[0].Upper);
 
-            Assert.True(result.Pages[1].Count == 2);
-            Assert.Null(result.Pages[1].ItemsOrNull);
-            Assert.Equal("2.0.0", result.Pages[1].Lower);
-            Assert.Equal("3.0.0", result.Pages[1].Upper);
+            Assert.True(result.Pages.ToArray()[1].Count == 2);
+            Assert.Null(result.Pages.ToArray()[1].ItemsOrNull);
+            Assert.Equal("2.0.0", result.Pages.ToArray()[1].Lower);
+            Assert.Equal("3.0.0", result.Pages.ToArray()[1].Upper);
         }
 
         [Fact]
@@ -62,11 +63,11 @@ namespace BaGet.Protocol.Tests
             Assert.NotNull(result);
             Assert.Equal(2, result.Count);
             Assert.NotNull(result.ItemsOrNull);
-            Assert.Equal(2, result.ItemsOrNull.Count);
+            Assert.Equal(2, result.ItemsOrNull.Count());
             Assert.Equal("2.0.0", result.Lower);
             Assert.Equal("3.0.0", result.Upper);
 
-            var firstMetadata = result.ItemsOrNull[0].PackageMetadata;
+            var firstMetadata = result.ItemsOrNull.ToArray()[0].PackageMetadata;
 
             Assert.Equal("Paged.Package", firstMetadata.PackageId);
             Assert.Equal("2.0.0+build", firstMetadata.Version);

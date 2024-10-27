@@ -42,11 +42,11 @@ namespace BaGet.Core.Tests.Metadata
             var response = registrationBuilder.BuildIndex(registration);
 
             // Assert
-            Assert.Equal(packages.Count, response.Pages[0].ItemsOrNull.Count);
+            Assert.Equal(packages.Count, response.Pages.First().ItemsOrNull.Count());
             var index = 0;
             foreach (var package in packages.OrderBy(p => p.Version))
             {
-                Assert.Equal(package.Version.ToFullString(), response.Pages[0].ItemsOrNull[index++].PackageMetadata.Version);
+                Assert.Equal(package.Version.ToFullString(), response.Pages.First().ItemsOrNull.ToArray()[index++].PackageMetadata.Version);
             }
         }
 

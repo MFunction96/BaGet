@@ -24,7 +24,7 @@ namespace BaGet.Core
         /// The package's versions, or an empty list if the package cannot be found.
         /// This includes unlisted versions.
         /// </returns>
-        Task<IReadOnlyList<NuGetVersion>> FindPackageVersionsAsync(string id, CancellationToken cancellationToken);
+        Task<IEnumerable<NuGetVersion>> FindPackageVersionsAsync(string id, CancellationToken cancellationToken);
 
         /// <summary>
         /// Attempt to find a package's metadata using mirroring. This will merge
@@ -36,7 +36,7 @@ namespace BaGet.Core
         /// The metadata for all versions of a package, including unlisted versions.
         /// Returns an empty list if the package cannot be found.
         /// </returns>
-        Task<IReadOnlyList<Package>> FindPackagesAsync(string id, CancellationToken cancellationToken);
+        Task<IEnumerable<Package>> FindPackagesAsync(string id, CancellationToken cancellationToken);
 
         /// <summary>
         /// Attempt to find a package's metadata using mirroring. This will merge

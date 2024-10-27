@@ -16,8 +16,7 @@ namespace BaGet.Core.Search
     public class DatabaseSearchService(
         BaGetDbContext context,
         IFrameworkCompatibilityService frameworksCompatibilityService,
-        ISearchResponseBuilder searchBuilder,
-        ILogger<DatabaseSearchService> logger)
+        ISearchResponseBuilder searchBuilder)
         : ISearchService
     {
         public async Task<SearchResponse> SearchAsync(SearchRequest request, CancellationToken cancellationToken)

@@ -15,7 +15,7 @@ namespace BaGet.Protocol.Tests
             var options = new JsonSerializerOptions();
             options.Converters.Add(new StringOrStringArrayJsonConverter());
 
-            var result = JsonSerializer.Deserialize<IReadOnlyList<string>>(json, options);
+            var result = JsonSerializer.Deserialize<IEnumerable<string>>(json, options);
 
             var first = Assert.Single(result);
             Assert.NotNull(first);
@@ -30,7 +30,7 @@ namespace BaGet.Protocol.Tests
             var options = new JsonSerializerOptions();
             options.Converters.Add(new StringOrStringArrayJsonConverter());
 
-            var result = JsonSerializer.Deserialize<IReadOnlyList<string>>(json, options);
+            var result = JsonSerializer.Deserialize<IEnumerable<string>>(json, options);
 
             var first = Assert.Single(result);
             Assert.Equal("Foo bar", first);
@@ -44,7 +44,7 @@ namespace BaGet.Protocol.Tests
             var options = new JsonSerializerOptions();
             options.Converters.Add(new StringOrStringArrayJsonConverter());
 
-            var result = JsonSerializer.Deserialize<IReadOnlyList<string>>(json, options);
+            var result = JsonSerializer.Deserialize<IEnumerable<string>>(json, options);
 
             Assert.Empty(result);
         }
@@ -57,9 +57,9 @@ namespace BaGet.Protocol.Tests
             var options = new JsonSerializerOptions();
             options.Converters.Add(new StringOrStringArrayJsonConverter());
 
-            var result = JsonSerializer.Deserialize<IReadOnlyList<string>>(json, options);
+            var result = JsonSerializer.Deserialize<string[]>(json, options);
 
-            Assert.Equal(2, result.Count);
+            Assert.Equal(2, result.Length);
             Assert.Equal("Foo", result[0]);
             Assert.Equal("bar", result[1]);
         }
@@ -78,7 +78,7 @@ namespace BaGet.Protocol.Tests
             options.Converters.Add(new StringOrStringArrayJsonConverter());
 
             Assert.Throws<JsonException>(
-                () => JsonSerializer.Deserialize<IReadOnlyList<string>>(json, options));
+                () => JsonSerializer.Deserialize<IEnumerable<string>>(json, options));
         }
 
         [Fact]
@@ -87,7 +87,7 @@ namespace BaGet.Protocol.Tests
             var options = new JsonSerializerOptions();
             options.Converters.Add(new StringOrStringArrayJsonConverter());
 
-            IReadOnlyList<string> list = null;
+            IEnumerable<string> list = null;
 
             var json = JsonSerializer.Serialize(list, options);
 
@@ -100,7 +100,7 @@ namespace BaGet.Protocol.Tests
             var options = new JsonSerializerOptions();
             options.Converters.Add(new StringOrStringArrayJsonConverter());
 
-            IReadOnlyList<string> list = new List<string> { "" };
+            IEnumerable<string> list = new List<string> { "" };
 
             var json = JsonSerializer.Serialize(list, options);
 
@@ -113,7 +113,7 @@ namespace BaGet.Protocol.Tests
             var options = new JsonSerializerOptions();
             options.Converters.Add(new StringOrStringArrayJsonConverter());
 
-            IReadOnlyList<string> list = new List<string> { "Hello", "World", null };
+            IEnumerable<string> list = new List<string> { "Hello", "World", null };
 
             var json = JsonSerializer.Serialize(list, options);
 

@@ -18,7 +18,8 @@ namespace BaGet.Core
     {
 #region Original properties from RegistrationIndexPage.
         [JsonPropertyName("@id")]
-        public string RegistrationPageUrl { get; set; }
+        [JsonIgnore(Condition = JsonIgnoreCondition.WhenWritingNull)]
+        public string? RegistrationPageUrl { get; set; }
 
         [JsonPropertyName("count")]
         public int Count { get; set; }
@@ -34,6 +35,6 @@ namespace BaGet.Core
         /// This was modified to use BaGet's extended registration index page item model.
         /// </summary>
         [JsonPropertyName("items")]
-        public IReadOnlyList<BaGetRegistrationIndexPageItem> ItemsOrNull { get; set; }
+        public IEnumerable<BaGetRegistrationIndexPageItem> ItemsOrNull { get; set; }
     }
 }

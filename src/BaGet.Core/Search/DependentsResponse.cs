@@ -19,7 +19,7 @@ namespace BaGet.Core
         /// The package IDs matched by the dependent query.
         /// </summary>
         [JsonPropertyName("data")]
-        public IReadOnlyList<PackageDependent> Data { get; set; }
+        public IEnumerable<PackageDependent> Data { get; set; }
     }
 
     /// <summary>

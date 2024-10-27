@@ -27,7 +27,7 @@ namespace BaGet.Protocol.Models
         /// by following the page's <see cref="RegistrationPageUrl"/>.
         /// </summary>
         [JsonPropertyName("items")]
-        public IReadOnlyList<RegistrationIndexPageItem> ItemsOrNull { get; set; }
+        public IEnumerable<RegistrationIndexPageItem> ItemsOrNull { get; set; }
 
         /// <summary>
         /// This page's lowest package version. The version should be lowercased, normalized,

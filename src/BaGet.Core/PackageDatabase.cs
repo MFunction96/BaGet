@@ -47,7 +47,7 @@ namespace BaGet.Core
                 .AnyAsync(cancellationToken);
         }
 
-        public async Task<IReadOnlyList<Package>> FindAsync(string id, bool includeUnlisted, CancellationToken cancellationToken)
+        public async Task<IEnumerable<Package>> FindAsync(string id, bool includeUnlisted, CancellationToken cancellationToken)
         {
             var query = context.Packages
                 .Include(p => p.Dependencies)
@@ -60,7 +60,7 @@ namespace BaGet.Core
                 query = query.Where(p => p.Listed);
             }
 
-            return (await query.ToListAsync(cancellationToken)).AsReadOnly();
+            return await query.ToListAsync(cancellationToken);
         }
 
         public Task<Package?> FindOrNullAsync(

@@ -14,6 +14,6 @@ namespace BaGet.Protocol.Models
         /// The versions, lowercased and normalized.
         /// </summary>
         [JsonPropertyName("versions")]
-        public IReadOnlyList<string> Versions { get; set; }
+        public IEnumerable<string> Versions { get; set; }
     }
 }

@@ -80,7 +80,7 @@ namespace BaGet.Core.Indexing
             }
         }
 
-        private async Task<IReadOnlyList<string>?> GetSymbolPackagePdbPathsOrNullAsync(
+        private async Task<IEnumerable<string>?> GetSymbolPackagePdbPathsOrNullAsync(
             PackageArchiveReader symbolPackage,
             CancellationToken cancellationToken)
         {
@@ -106,7 +106,7 @@ namespace BaGet.Core.Indexing
             }
         }
 
-        private bool AreSymbolFilesValid(IReadOnlyList<string> entries)
+        private bool AreSymbolFilesValid(IEnumerable<string> entries)
         {
             // TODO: Validate that all PDBs are portable. See: https://github.com/NuGet/NuGetGallery/blob/master/src/NuGetGallery/Services/SymbolPackageService.cs#L174
             bool IsValidSymbolFileInfo(FileInfo file)

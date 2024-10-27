@@ -12,15 +12,15 @@ namespace BaGet.Core
     /// </summary>
     public class DisabledUpstreamClient : IUpstreamClient
     {
-        private readonly IReadOnlyList<NuGetVersion> _emptyVersionList = new List<NuGetVersion>();
-        private readonly IReadOnlyList<Package> _emptyPackageList = new List<Package>();
+        private readonly IEnumerable<NuGetVersion> _emptyVersionList = new List<NuGetVersion>();
+        private readonly IEnumerable<Package> _emptyPackageList = new List<Package>();
 
-        public Task<IReadOnlyList<NuGetVersion>> ListPackageVersionsAsync(string id, CancellationToken cancellationToken)
+        public Task<IEnumerable<NuGetVersion>> ListPackageVersionsAsync(string id, CancellationToken cancellationToken)
         {
             return Task.FromResult(_emptyVersionList);
         }
 
-        public Task<IReadOnlyList<Package>> ListPackagesAsync(string id, CancellationToken cancellationToken)
+        public Task<IEnumerable<Package>> ListPackagesAsync(string id, CancellationToken cancellationToken)
         {
             return Task.FromResult(_emptyPackageList);
         }

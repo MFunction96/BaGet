@@ -53,7 +53,7 @@ namespace BaGet.Core
     //        }
     //    }
 
-    //    public async Task<IReadOnlyList<Package>> ListPackagesAsync(
+    //    public async Task<IEnumerable<Package>> ListPackagesAsync(
     //        string id,
     //        CancellationToken cancellationToken)
     //    {
@@ -70,7 +70,7 @@ namespace BaGet.Core
     //        }
     //    }
 
-    //    public async Task<IReadOnlyList<NuGetVersion>> ListPackageVersionsAsync(
+    //    public async Task<IEnumerable<NuGetVersion>> ListPackageVersionsAsync(
     //        string id,
     //        CancellationToken cancellationToken)
     //    {

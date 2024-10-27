@@ -34,11 +34,11 @@ namespace BaGet.Core.Tests
                     new Package { Version = new NuGetVersion("2.0.0") },
                 });
 
-                var results = await _target.FindPackageVersionsAsync(
+                var results = (await _target.FindPackageVersionsAsync(
                     "MyPackage",
-                    _cancellationToken);
+                    _cancellationToken)).ToArray();
 
-                Assert.Equal(2, results.Count);
+                Assert.Equal(2, results.Length);
                 Assert.Equal("1.0.0", results[0].OriginalVersion);
                 Assert.Equal("2.0.0", results[1].OriginalVersion);
             }
@@ -89,8 +89,8 @@ namespace BaGet.Core.Tests
             //}
 
             private void Setup(
-                IReadOnlyList<Package> localPackages = null,
-                IReadOnlyList<NuGetVersion> upstreamPackages = null)
+                IEnumerable<Package> localPackages = null,
+                IEnumerable<NuGetVersion> upstreamPackages = null)
             {
                 localPackages = localPackages ?? new List<Package>();
                 upstreamPackages = upstreamPackages ?? new List<NuGetVersion>();
@@ -131,9 +131,9 @@ namespace BaGet.Core.Tests
                     new Package { Version = new NuGetVersion("2.0.0") },
                 });
 
-                var results = await _target.FindPackagesAsync("MyPackage", _cancellationToken);
+                var results = (await _target.FindPackagesAsync("MyPackage", _cancellationToken)).ToArray();
 
-                Assert.Equal(2, results.Count);
+                Assert.Equal(2, results.Length);
                 Assert.Equal("1.0.0", results[0].Version.OriginalVersion);
                 Assert.Equal("2.0.0", results[1].Version.OriginalVersion);
             }
@@ -179,8 +179,8 @@ namespace BaGet.Core.Tests
             //}
 
             private void Setup(
-                IReadOnlyList<Package> localPackages = null,
-                IReadOnlyList<Package> upstreamPackages = null)
+                IEnumerable<Package> localPackages = null,
+                IEnumerable<Package> upstreamPackages = null)
             {
                 localPackages = localPackages ?? new List<Package>();
                 upstreamPackages = upstreamPackages ?? new List<Package>();

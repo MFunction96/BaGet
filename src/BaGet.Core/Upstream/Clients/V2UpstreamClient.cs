@@ -50,7 +50,7 @@ namespace BaGet.Core
     //        _repository = Repository.Factory.GetCoreV2(new PackageSource(options.Value.PackageSource.AbsoluteUri));
     //    }
 
-    //    public async Task<IReadOnlyList<NuGetVersion>> ListPackageVersionsAsync(string id, CancellationToken cancellationToken)
+    //    public async Task<IEnumerable<NuGetVersion>> ListPackageVersionsAsync(string id, CancellationToken cancellationToken)
     //    {
     //        try
     //        {
@@ -66,7 +66,7 @@ namespace BaGet.Core
     //        }
     //    }
 
-    //    public async Task<IReadOnlyList<Package>> ListPackagesAsync(
+    //    public async Task<IEnumerable<Package>> ListPackagesAsync(
     //        string id,
     //        CancellationToken cancellationToken)
     //    {

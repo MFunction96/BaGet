@@ -23,7 +23,7 @@ Find all versions of the `Newtonsoft.Json` package:
 ```csharp
 NuGetClient client = new NuGetClient("https://api.nuget.org/v3/index.json");
 
-IReadOnlyList<NuGetVersion>> versions = await client.ListPackageVersionsAsync("Newtonsoft.Json");
+IEnumerable<NuGetVersion>> versions = await client.ListPackageVersionsAsync("Newtonsoft.Json");
 
 foreach (NuGetVersion version in versions)
 {
@@ -51,7 +51,7 @@ using (Stream packageStream = await client.DownloadPackageAsync(packageId, packa
 NuGetClient client = new NuGetClient("https://api.nuget.org/v3/index.json");
 
 // Find the metadata for all versions of a package.
-IReadOnlyList<PackageMetadata> items = await client.GetPackageMetadataAsync("Newtonsoft.Json");
+IEnumerable<PackageMetadata> items = await client.GetPackageMetadataAsync("Newtonsoft.Json");
 if (!items.Any())
 {
     Console.WriteLine($"Package 'Newtonsoft.Json' does not exist");
@@ -83,7 +83,7 @@ Search for "json" packages:
 
 ```csharp
 NuGetClient client = new NuGetClient("https://api.nuget.org/v3/index.json");
-IReadOnlyList<SearchResult> results = await client.SearchAsync("json");
+IEnumerable<SearchResult> results = await client.SearchAsync("json");
 
 foreach (SearchResult result in results)
 {

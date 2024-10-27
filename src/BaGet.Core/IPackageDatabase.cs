@@ -42,7 +42,7 @@ namespace BaGet.Core
         /// <param name="includeUnlisted">Whether unlisted results should be included.</param>
         /// <param name="cancellationToken">A token to cancel the task.</param>
         /// <returns>The packages found. Always non-null.</returns>
-        Task<IReadOnlyList<Package>> FindAsync(string id, bool includeUnlisted, CancellationToken cancellationToken);
+        Task<IEnumerable<Package>> FindAsync(string id, bool includeUnlisted, CancellationToken cancellationToken);
 
         /// <summary>
         /// Determine whether a package exists in the database (even if the package is unlisted).

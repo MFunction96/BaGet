@@ -41,9 +41,9 @@ namespace BaGet.Pages
         public DateTime LastUpdated { get; private set; }
         public long TotalDownloads { get; private set; }
 
-        public IReadOnlyList<PackageDependent>? UsedBy { get; set; }
-        public IReadOnlyList<DependencyGroupModel>? DependencyGroups { get; private set; }
-        public IReadOnlyList<VersionModel>? Versions { get; private set; }
+        public IEnumerable<PackageDependent>? UsedBy { get; set; }
+        public IEnumerable<DependencyGroupModel>? DependencyGroups { get; private set; }
+        public IEnumerable<VersionModel>? Versions { get; private set; }
 
         public HtmlString Readme { get; private set; } = HtmlString.Empty;
 
@@ -98,7 +98,7 @@ namespace BaGet.Pages
             PackageDownloadUrl = url.GetPackageDownloadUrl(Package.Id, packageVersion);
         }
 
-        private IReadOnlyList<DependencyGroupModel> ToDependencyGroups(Package package)
+        private IEnumerable<DependencyGroupModel> ToDependencyGroups(Package package)
         {
             return package
                 .Dependencies
@@ -167,7 +167,7 @@ namespace BaGet.Pages
             return $"{frameworkName} {frameworkVersion}";
         }
 
-        private IReadOnlyList<VersionModel> ToVersions(IReadOnlyList<Package> vPackages, NuGetVersion selectedVersion)
+        private IEnumerable<VersionModel> ToVersions(IEnumerable<Package> vPackages, NuGetVersion selectedVersion)
         {
             return vPackages
                 .Select(p => new VersionModel
@@ -204,7 +204,7 @@ namespace BaGet.Pages
         public class DependencyGroupModel
         {
             public string Name { get; set; }
-            public IReadOnlyList<DependencyModel>? Dependencies { get; set; }
+            public IEnumerable<DependencyModel>? Dependencies { get; set; }
         }
 
         // TODO: Convert this to records.
