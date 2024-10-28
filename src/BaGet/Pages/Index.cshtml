@@ -1,5 +1,4 @@
 @page "{q?}"
-@using BaGet.Extensions
 @using Microsoft.AspNetCore.Mvc.TagHelpers
 @model BaGet.Pages.IndexModel
 
@@ -35,7 +34,7 @@
         <div class="search-dropdown">
             <div class="dropdown">
                 <button class="btn btn-default dropdown-toggle" type="button" id="package-type" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                    @PackageTypes.GetValueOrDefault(Model.PackageType, "Other")
+                    @(PackageTypes.TryGetValue(Model.PackageType, out var type) ? type : "Other")
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="package-type">
@@ -54,7 +53,7 @@
         <div class="search-dropdown">
             <div class="dropdown">
                 <button class="btn btn-default dropdown-toggle" type="button" id="framework" data-toggle="dropdown" aria-haspopup="true" aria-expanded="true">
-                    @TargetFrameworks.GetValueOrDefault(Model.Framework, "Other")
+                    @(TargetFrameworks.TryGetValue(Model.Framework, out var target) ? target : "Other")
                     <span class="caret"></span>
                 </button>
                 <ul class="dropdown-menu" aria-labelledby="framework">
@@ -109,7 +108,7 @@ else
             <div class="col-sm-1 hidden-xs hidden-sm">
                 <img src="@package.IconUrl"
                      class="package-icon img-responsive"
-                     onerror="this.src='@Url.Content("~/_content/BaGet.Web/images/default-package-icon-256x256.png")'"
+                     onerror="this.src='@Url.Content("~/images/default-package-icon-256x256.png")'"
                      alt="The package icon" />
             </div>
             <div class="col-sm-11">
@@ -175,7 +174,7 @@ else
 
 @functions {
 
-    private IReadOnlyDictionary<string, string> PackageTypes { get; } = new Dictionary<string, string>()
+    private IDictionary<string, string> PackageTypes { get; } = new Dictionary<string, string>()
     {
         { "any", "Any" },
         { "dependency", "Dependency" },
@@ -183,13 +182,16 @@ else
         { "dotnettemplate", ".NET template" },
     };
 
-    private IReadOnlyDictionary<string, string> TargetFrameworks { get; } = new Dictionary<string, string>()
+    private IDictionary<string, string> TargetFrameworks { get; } = new Dictionary<string, string>()
     {
         { "any", "Any" },
 
         { "divider1", "-" },
         { "header1", ".NET" },
 
+        { "net8.0", ".NET 8.0" },
+        { "net7.0", ".NET 7.0" },
+        { "net6.0", ".NET 6.0" },
         { "net5.0", ".NET 5.0" },
 
         { "divider2", "-" },

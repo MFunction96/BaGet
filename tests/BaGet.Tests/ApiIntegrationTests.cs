@@ -366,13 +366,13 @@ namespace BaGet.Tests
         [Fact]
         public async Task SymbolDownloadReturnsOk()
         {
-            //await _app.AddPackageAsync(_packageStream);
-            //await _app.AddSymbolPackageAsync(_symbolPackageStream);
+            await _app.AddPackageAsync(_packageStream);
+            await _app.AddSymbolPackageAsync(_symbolPackageStream);
 
-            //using var response = await _client.GetAsync(
-            //    "api/download/symbols/testdata.pdb/16F71ED8DD574AA2AD4A22D29E9C981Bffffffff/testdata.pdb");
+            using var response = await _client.GetAsync(
+                "api/download/symbols/testdata.pdb/16F71ED8DD574AA2AD4A22D29E9C981Bffffffff/testdata.pdb");
 
-            //Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
         [Theory]
@@ -381,12 +381,12 @@ namespace BaGet.Tests
         [InlineData("api/download/symbols/testprefix/testdata.pdb/16F71ED8DD574AA2AD4A22D29E9C981Bffffffff/testdata.pdb")]
         public async Task MalformedSymbolDownloadReturnsOk(string uri)
         {
-            //await _app.AddPackageAsync(_packageStream);
-            //await _app.AddSymbolPackageAsync(_symbolPackageStream);
+            await _app.AddPackageAsync(_packageStream);
+            await _app.AddSymbolPackageAsync(_symbolPackageStream);
 
-            //using var response = await _client.GetAsync(uri);
+            using var response = await _client.GetAsync(uri);
 
-            //Assert.Equal(HttpStatusCode.OK, response.StatusCode);
+            Assert.Equal(HttpStatusCode.OK, response.StatusCode);
         }
 
         [Fact]

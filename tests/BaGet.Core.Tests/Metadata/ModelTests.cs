@@ -104,11 +104,11 @@ namespace BaGet.Core.Tests.Metadata
         [MemberData(nameof(ExtendedModelsData))]
         public void ValidateExtendedModels(ExtendedModelData data)
         {
-            IReadOnlyDictionary<string, PropertyInfo> originalProperties = data
+            IDictionary<string, PropertyInfo> originalProperties = data
                 .OriginalType
                 .GetProperties()
                 .ToDictionary(p => p.Name, p => p);
-            IReadOnlyDictionary<string, PropertyInfo> derivedProperties = data
+            IDictionary<string, PropertyInfo> derivedProperties = data
                 .DerivedType
                 .GetProperties()
                 .ToDictionary(p => p.Name, p => p);

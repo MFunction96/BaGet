@@ -52,11 +52,12 @@ namespace BaGet.Core.Indexing
                 }
 
                 using var pdbs = new PdbList();
+                var fileCache = fileCachePool.Register();
                 // Extract the portable PDBs from the snupkg. Nothing is persisted until after all
                 // PDBs have been extracted and validated sucessfully.
                 foreach (var pdbPath in pdbPaths)
                 {
-                    var portablePdb = await ExtractPortablePdbAsync(symbolPackage, pdbPath, cancellationToken);
+                    var portablePdb = await ExtractPortablePdbAsync(symbolPackage, fileCache, pdbPath, cancellationToken);
                     if (portablePdb == null)
                     {
                         return SymbolIndexingResult.InvalidSymbolPackage;
@@ -123,24 +124,24 @@ namespace BaGet.Core.Indexing
 
         private async Task<PortablePdb?> ExtractPortablePdbAsync(
             PackageArchiveReader symbolPackage,
+            FileCache fileCache,
             string pdbPath,
             CancellationToken cancellationToken)
         {
             // TODO: Validate that the PDB has a corresponding DLL
             // See: https://github.com/NuGet/NuGet.Jobs/blob/master/src/Validation.Symbols/SymbolsValidatorService.cs#L170
             PortablePdb result;
-            using var pdbFile = fileCachePool.Register();
             
             try
             {
                 await using var rawPdbStream = await symbolPackage.GetStreamAsync(pdbPath, cancellationToken);
                 await using var pdbFileStream =
-                    new BufferedStream(new FileStream(pdbFile.FullPath, FileMode.Create, FileAccess.Write));
+                    new BufferedStream(new FileStream(fileCache.FullPath, FileMode.Create, FileAccess.Write));
                 await rawPdbStream.CopyToAsync(pdbFileStream, cancellationToken);
                 pdbFileStream.Close();
                 rawPdbStream.Close();
 
-                await using var pdbStream = new FileStream(pdbFile.FullPath, FileMode.Open, FileAccess.Read);
+                var pdbStream = new FileStream(fileCache.FullPath, FileMode.Open, FileAccess.Read);
                 string signature;
                 using (var pdbReaderProvider = MetadataReaderProvider.FromPortablePdbStream(pdbStream, MetadataStreamOptions.LeaveOpen))
                 {
