@@ -54,18 +54,18 @@ namespace BaGet.Controllers
             }
         }
 
-        [HttpGet("download/symbols/{file}/{key}", Name = Routes.SymbolDownloadRouteName)]
+        [HttpGet("download/symbols/{file}/{key}/{_}", Name = Routes.SymbolDownloadRouteName)]
         public async Task<IActionResult> Get(string file, string key)
         {
             var pdbStream = await storage.GetPortablePdbContentStreamOrNullAsync(file, key);
-
-            return File(pdbStream, "application/octet-stream");
+            return pdbStream is null ? NotFound() : File(pdbStream, "application/octet-stream");
         }
 
         [HttpGet("download/symbols/{prefix}/{file}/{key}/{file2}", Name = Routes.PrefixedSymbolDownloadRouteName)]
-        public Task<IActionResult> Get(string prefix, string file, string key, string file2)
+        public async Task<IActionResult> Get(string prefix, string file, string key, string file2)
         {
-            throw new NotImplementedException();
+            var pdbStream = await storage.GetPortablePdbContentStreamOrNullAsync(file, key);
+            return pdbStream is null ? NotFound() : File(pdbStream, "application/octet-stream");
         }
     }
 }

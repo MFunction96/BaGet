@@ -33,7 +33,7 @@ namespace BaGet.Core
             }
         }
 
-        public async Task<Stream> GetPortablePdbContentStreamOrNullAsync(string filename, string key)
+        public async Task<Stream?> GetPortablePdbContentStreamOrNullAsync(string filename, string key)
         {
             var path = GetPathForKey(filename, key);
 
