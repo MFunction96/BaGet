@@ -66,6 +66,10 @@ namespace BaGet
                             x => x.MigrationsAssembly("BaGet.Database.Mariadb")),
                         "sqlite" => builder.UseSqlite(options.ConnectionString,
                             x => x.MigrationsAssembly("BaGet.Database.Sqlite")),
+                        "sqlserver" => builder.UseSqlServer(options.ConnectionString,
+                            x => x.MigrationsAssembly("BaGet.Database.SqlServer")),
+                        "postgresql" => builder.UseNpgsql(options.ConnectionString,
+                            x => x.MigrationsAssembly("BaGet.Database.PostgreSql")),
                         _ => throw new ArgumentOutOfRangeException(nameof(options.Type), "Unsupported Database!")
                     };
                 }

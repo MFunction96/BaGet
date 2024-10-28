@@ -15,10 +15,10 @@ There has been no update onto the [original BaGet repository](https://github.com
 
 **Do SUPPORT**
 
-- Core NuGet Server function, including Upload, Store, Restore package.
+- Core NuGet Server function, including Upload, Store, Restore packages and symbols.
 - *(In future)* User control/API Token and Package Management
-- Based on .NET 8 and above LTS
-- MariaDB and SQLite
+- Based on .NET 8, EF Core 8 and above LTS version
+- MariaDB, MySQL, SQLite, SQL Server, PostgreSQL
 - FileSystem storage
 - Docker
 - *(In future)* `deb` for Linux, `msi`(or `exe`) for Windows easy-installation
@@ -28,7 +28,7 @@ There has been no update onto the [original BaGet repository](https://github.com
 **DO NOT SUPPORT**
 
 - Custom Cloud components, such as AWS, Azure, Aliyun, etc.
-- AzureTable, MySQL, SQL Server, PostgreSql, etc.
+- AzureTable, PostgreSql, etc.
 - Non-FileSystem storage component, such as Azure Blob, etc.
 
 ---
